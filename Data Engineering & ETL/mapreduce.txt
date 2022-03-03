@@ -1,0 +1,448 @@
+hduser@hduser-VirtualBox:~$ ls -l /mnt/hgfs/sharedfolder
+total 9168
+-rwxrwxrwx 1 root root     201 Nov 15 03:45 Customer.csv
+-rwxrwxrwx 1 root root     158 Nov 15 03:45 Employee.csv
+drwxrwxrwx 1 root root    4096 Nov 15 15:15 FilterJobNew
+-rwxrwxrwx 1 root root     284 Nov 16 15:14 latviewtestdata.txt
+drwxrwxrwx 1 root root    4096 Nov 15 15:55 MapRed1
+-rwxrwxrwx 1 root root    8047 May 12  2016 mrinput1 (2).txt
+-rwxrwxrwx 1 root root    8047 May 12  2016 mrinput1.txt
+-rwxrwxrwx 1 root root    9373 May 12  2016 mrinput2 (2).txt
+-rwxrwxrwx 1 root root    9373 May 12  2016 mrinput2.txt
+-rwxrwxrwx 1 root root 9277177 Nov  3  2015 NYSE_daily
+-rwxrwxrwx 1 root root   57814 Nov  3  2015 NYSE_dividends
+-rwxrwxrwx 1 root root     121 Nov 15 03:45 Order.csv
+-rwxrwxrwx 1 root root     204 Nov 16 17:04 retaildata.json
+-rwxrwxrwx 1 root root     571 Nov 16 15:15 studentsubjectsandgrades.txt
+-rwxrwxrwx 1 root root     237 Nov 16 17:09 testdoc.json
+drwxrwxrwx 1 root root    4096 Nov 15 15:15 WordCount
+hduser@hduser-VirtualBox:~$ start-dfs.sh
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-namenode-hduser-VirtualBox.out
+localhost: starting datanode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-datanode-hduser-VirtualBox.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-secondarynamenode-hduser-VirtualBox.out
+hduser@hduser-VirtualBox:~$ hadoop fs -ls /
+Found 3 items
+drwxr-xr-x   - hduser supergroup          0 2018-09-21 13:00 /hbase
+drwxrwxr-x   - hduser supergroup          0 2018-10-27 05:51 /tmp
+drwxr-xr-x   - hduser supergroup          0 2021-11-16 19:56 /user
+hduser@hduser-VirtualBox:~$ hadoop fs -mkdir /Rajiya
+hduser@hduser-VirtualBox:~$ hadoop fs -ls /
+Found 4 items
+drwxr-xr-x   - hduser supergroup          0 2021-11-17 14:48 /Rajiya
+drwxr-xr-x   - hduser supergroup          0 2018-09-21 13:00 /hbase
+drwxrwxr-x   - hduser supergroup          0 2018-10-27 05:51 /tmp
+drwxr-xr-x   - hduser supergroup          0 2021-11-16 19:56 /user
+
+hduser@hduser-VirtualBox:~$ sudo vmhgfs-fuse .host:/sharedfolder /home/hduser/Downloads/sharedfolder/ -o allow_other
+[sudo] password for hduser: 
+hduser@hduser-VirtualBox:~$ start-dfs.sh
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-namenode-hduser-VirtualBox.out
+localhost: starting datanode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-datanode-hduser-VirtualBox.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-secondarynamenode-hduser-VirtualBox.out
+hduser@hduser-VirtualBox:~$ cp Downloads/sharedfolder/* $HOME
+hduser@hduser-VirtualBox:~$ mkdir mapred
+hduser@hduser-VirtualBox:~$ mkdir nyse
+hduser@hduser-VirtualBox:~$ cd nyse
+hduser@hduser-VirtualBox:~/nyse$ tail -n +2 NYSE_daily >NYSE_daily.tsv
+hduser@hduser-VirtualBox:~/nyse$ tail -n +2 NYSE_dividends >NYSE_dividends.tsv
+hduser@hduser-VirtualBox:~/nyse$ cd/home/hduser
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -mkdir mrdata
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -mkdir nyse
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -put mapred/mrinput?.txt mrdata
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -put nyse/NYSE* nyse
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -rm nyse/NYSE_daily
+hduser@hduser-VirtualBox:~/nyse$ hadoop fs -rm nyse/NYSE_dividends
+hduser@hduser-VirtualBox:~/nyse$ start-yarn.sh
+starting yarn daemons
+starting resourcemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-resourcemanager-hduser-VirtualBox.out
+localhost: starting nodemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-nodemanager-hduser-VirtualBox.out
+hduser@hduser-VirtualBox:~/nyse$ cd
+/home/hduser/nyse
+hduser@hduser-VirtualBox:~/nyse$ cd
+hduser@hduser-VirtualBox:~$ pwd
+/home/hduser
+hduser@hduser-VirtualBox:~$ cd Downloads/sharedfolder/MapRed1
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ jar -tvf MapRed1.jar
+    25 Sun Mar 03 00:59:00 IST 2019 META-INF/MANIFEST.MF
+   364 Thu Jun 30 00:51:28 IST 2016 .classpath
+   366 Thu Jun 30 00:51:08 IST 2016 .project
+  2217 Sun Mar 03 00:56:44 IST 2019 MR1Reducer.class
+  2157 Sun Mar 03 00:56:44 IST 2019 MR1Mapper.class
+  2366 Sun Mar 03 00:56:44 IST 2019 MR1Driver.class
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ jar -tvf MapRed1.jar MR1Driver mrdata/mrinput2.txt output2
+  2366 Sun Mar 03 00:56:44 IST 2019 MR1Driver.class
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ ls -l
+total 9
+-rwxrwxrwx 1 root root  4075 Mar  3  2019 MapRed1.jar
+-rwxrwxrwx 1 root root  2024 Mar  3  2019 MR1Driver.java
+-rwxrwxrwx 1 root root  1073 Jan 25  2017 MR1Mapper.java
+-rwxrwxrwx 1 root root  1052 Jan 25  2017 MR1Reducer.java
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ hadoop fs -ls
+Found 3 items
+drwx------   - hduser supergroup          0 2021-11-15 20:38 .Trash
+drwxr-xr-x   - hduser supergroup          0 2021-11-15 20:34 mrdata
+drwxr-xr-x   - hduser supergroup          0 2021-11-16 17:29 nyse
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ yarn jar MapRed1.jar MR1Driver mrdata/mrinput2.txt output2
+21/11/18 00:19:48 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+21/11/18 00:19:49 INFO client.RMProxy: Connecting to ResourceManager at /127.0.1.1:8032
+21/11/18 00:19:50 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+21/11/18 00:19:51 INFO input.FileInputFormat: Total input files to process : 1
+21/11/18 00:19:51 WARN hdfs.DataStreamer: Caught exception
+java.lang.InterruptedException
+	at java.lang.Object.wait(Native Method)
+	at java.lang.Thread.join(Thread.java:1252)
+	at java.lang.Thread.join(Thread.java:1326)
+	at org.apache.hadoop.hdfs.DataStreamer.closeResponder(DataStreamer.java:980)
+	at org.apache.hadoop.hdfs.DataStreamer.endBlock(DataStreamer.java:630)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:807)
+21/11/18 00:19:51 INFO mapreduce.JobSubmitter: number of splits:1
+21/11/18 00:19:51 INFO Configuration.deprecation: yarn.resourcemanager.system-metrics-publisher.enabled is deprecated. Instead, use yarn.system-metrics-publisher.enabled
+21/11/18 00:19:51 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1637174134629_0001
+21/11/18 00:19:52 INFO impl.YarnClientImpl: Submitted application application_1637174134629_0001
+21/11/18 00:19:52 INFO mapreduce.Job: The url to track the job: http://hduser-VirtualBox:8088/proxy/application_1637174134629_0001/
+21/11/18 00:19:52 INFO mapreduce.Job: Running job: job_1637174134629_0001
+21/11/18 00:20:04 INFO mapreduce.Job: Job job_1637174134629_0001 running in uber mode : false
+21/11/18 00:20:04 INFO mapreduce.Job:  map 0% reduce 0%
+21/11/18 00:20:10 INFO mapreduce.Job:  map 100% reduce 0%
+21/11/18 00:20:16 INFO mapreduce.Job:  map 100% reduce 100%
+21/11/18 00:20:16 INFO mapreduce.Job: Job job_1637174134629_0001 completed successfully
+21/11/18 00:20:16 INFO mapreduce.Job: Counters: 49
+	File System Counters
+		FILE: Number of bytes read=5136
+		FILE: Number of bytes written=405157
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=9492
+		HDFS: Number of bytes written=2133
+		HDFS: Number of read operations=6
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=2
+	Job Counters 
+		Launched map tasks=1
+		Launched reduce tasks=1
+		Data-local map tasks=1
+		Total time spent by all maps in occupied slots (ms)=4164
+		Total time spent by all reduces in occupied slots (ms)=3525
+		Total time spent by all map tasks (ms)=4164
+		Total time spent by all reduce tasks (ms)=3525
+		Total vcore-milliseconds taken by all map tasks=4164
+		Total vcore-milliseconds taken by all reduce tasks=3525
+		Total megabyte-milliseconds taken by all map tasks=4263936
+		Total megabyte-milliseconds taken by all reduce tasks=3609600
+	Map-Reduce Framework
+		Map input records=199
+		Map output records=199
+		Map output bytes=4732
+		Map output materialized bytes=5136
+		Input split bytes=119
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=78
+		Reduce shuffle bytes=5136
+		Reduce input records=199
+		Reduce output records=78
+		Spilled Records=398
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=149
+		CPU time spent (ms)=1270
+		Physical memory (bytes) snapshot=374202368
+		Virtual memory (bytes) snapshot=3902455808
+		Total committed heap usage (bytes)=222429184
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=9373
+	File Output Format Counters 
+		Bytes Written=2133
+Job was successful
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ hadoop fs -ls
+Found 4 items
+drwx------   - hduser supergroup          0 2021-11-15 20:38 .Trash
+drwxr-xr-x   - hduser supergroup          0 2021-11-15 20:34 mrdata
+drwxr-xr-x   - hduser supergroup          0 2021-11-16 17:29 nyse
+drwxr-xr-x   - hduser supergroup          0 2021-11-15 21:06 output2
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ hadoop fs -ls output2Found 2 items
+-rw-r--r--   1 hduser supergroup          0 2021-11-15 21:06 output2/_SUCCESS
+-rw-r--r--   1 hduser supergroup       2133 2021-11-15 21:06 output2/part-r-00000
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/MapRed1$ hadoop fs -cat output2/part-r-00000
+"AR Resources, Inc."	1
+"American Adjustment Bureau, Inc"	1
+"Bayview Loan Servicing, LLC"	3
+"Caliber Home Loans, Inc"	1
+"Capital Accounts, LLC"	1
+"Capital Management Services, LP"	1
+"Choice Recovery, Inc."	1
+"Continental Finance Company, LLC"	1
+"Convergent Resources, Inc."	3
+"Credit Karma, Inc."	1
+"Credit Protection Association, L.P."	1
+"Dynamic Recovery Solutions, LLC"	1
+"Enova International, Inc."	1
+"Fidelity National Information Services, Inc. (FNIS)"	3
+"Gold Key Credit, Inc."	1
+"Hunter Warfield, Inc."	3
+"I.C. System, Inc."	2
+"Malcolm S. Gerald and Associates, Inc."	1
+"Maury Cobb, Attorney at Law, LLC"	1
+"Meridian Financial Services, Inc."	1
+"NCC Business Services, Inc."	2
+"Nationwide Debt Management Solutions, LLC"	1
+"Navient Solutions, Inc."	3
+"Nicholas Financial, Inc."	1
+"Overton, Russell, Doerr and Donovan, LLP"	1
+"Palm Beach Credit Adjustors, Inc"	1
+"Pinnacle Credit Services, LLC"	1
+"Portfolio Recovery Associates, Inc."	1
+"Pressler & Pressler, LLP"	1
+"ResidentCollect, Inc."	1
+"Risecredit, LLC"	1
+"TransUnion Intermediate Holdings, Inc."	10
+"URS Holding, LLC"	1
+"Westlake Services, LLC"	1
+Ally Financial Inc.	6
+Amex	2
+Automotive Credit Corporation	1
+Bank of America	3
+Barclays PLC	1
+Caine & Weiner Co. Inc.	1
+Capital One	3
+Citibank	6
+Clarity Services	1
+Commercial Recovery Systems	1
+Consumer Collection Management. Inc	1
+Discover	1
+ERC	2
+Encore Capital Group	4
+Equifax	51
+Experian	11
+Fifth Third Financial Corporation	1
+First Advantage Corporation	1
+First Federal Credit Control	2
+Ford Motor Credit Company	1
+Freedom Mortgage	2
+GC Services Limited Partnership	1
+GM Financial	1
+HSBC North America Holdings Inc.	1
+JPMorgan Chase & Co.	7
+Leaders Financial Company	1
+MoneyGram	1
+Nationstar Mortgage	5
+Network Capital Funding Corporation	1
+Ocwen	1
+RMP Group Inc.	1
+Residential Credit Solutions	1
+Round Point Mortgage	1
+Round Two Recovery	1
+Rushmore Loan Management Services LLC	1
+Southern Management Systems Inc.	1
+Speedy Cash Holdings	1
+Stellar Recovery Inc.	1
+Suburban Credit Corporation	1
+Sunrise Credit Services Inc.	1
+Transworld Systems Inc.	3
+U.S. Bancorp	1
+United Revenue Corporation	1
+Wells Fargo & Company	8
+hduser@hduser-VirtualBox:~$ cd
+hduser@hduser-VirtualBox:~$ cd Downloads/sharedfolder/WordCount
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -mkdir wcinput
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -ls
+Found 15 items
+drwx------   - hduser supergroup          0 2021-11-15 20:38 .Trash
+drwxr-xr-x   - hduser supergroup          0 2021-11-15 20:34 mrdata
+drwxr-xr-x   - hduser supergroup          0 2021-11-16 17:29 nyse
+drwxr-xr-x   - hduser supergroup          0 2021-11-15 21:06 output2
+drwxr-xr-x   - hduser supergroup          0 2021-11-18 00:26 wcinput
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -mkdir wcinput1
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -put war_and_peace.txt wcinput1
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ yarn jar WordCount.jar WordCount wcinput wcoutput
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -ls wcoutput
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -ls wcoutput/part-r-00001
+hduser@hduser-VirtualBox:~/Downloads/sharedfolder/WordCount$ hadoop fs -cat wcoutput/part-r-00001
+
+hduser@hduser-VirtualBox:~$ hive
+
+Logging initialized using configuration in jar:file:/usr/local/hive/lib/hive-common-1.2.2.jar!/hive-log4j.properties
+hive> show databases;
+OK
+default
+Time taken: 1.03 seconds, Fetched: 3 row(s)
+hive> create database office;
+OK
+Time taken: 0.226 seconds
+hive> show databases;
+OK
+default
+office
+Time taken: 0.027 seconds, Fetched: 3 row(s)
+hive> use office;
+OK
+Time taken: 0.019 seconds
+hive> describe database default;
+OK
+default	Default Hive database	hdfs://localhost:54310/user/hive/warehouse	public	ROLE	
+Time taken: 0.087 seconds, Fetched: 1 row(s)
+hive> describe database extended office;
+OK
+office		hdfs://localhost:54310/user/hive/warehouse/office.db	hduser	USER	
+Time taken: 0.016 seconds, Fetched: 1 row(s)
+hive> show tables;
+OK
+Time taken: 0.044 seconds
+hive> create table employee
+    >  (ID INT, Name STRING, Dept STRING, Yoj INT, Salary INT)
+    >  row format delimited fields terminated by ','
+    >  tblproperties("skip.header.line.count"="1")
+    >  ;
+OK
+Time taken: 0.405 seconds
+hive> show tables;
+OK
+employee
+Time taken: 0.033 seconds, Fetched: 1 row(s)
+hive> select * from employee;
+OK
+Time taken: 0.429 seconds
+hive> LOAD DATA LOCAL INPATH
+    >  '/home/hduser/Downloads/sharedfolder/Employee.csv'
+    >  INTO TABLE employee
+    >  ;
+Loading data to table office.employee
+Table office.employee stats: [numFiles=1, totalSize=158]
+OK
+Time taken: 1.358 seconds
+hive> select * from employee;
+OK
+10001	Rose	IT	2012	26000
+10002	Sam	Sales	2012	22000
+10003	Mike	HR	2013	30000
+10004	Nick	SC	2013	20000
+10005	John	Fin	2014	27000
+Time taken: 0.129 seconds, Fetched: 5 row(s)
+hive> select count(*) from employee;
+Query ID = hduser_20211118012028_b694e402-4dc3-42f7-a856-8f0e0c5f9596
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637177478055_0001, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637177478055_0001/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637177478055_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-18 01:20:42,211 Stage-1 map = 0%,  reduce = 0%
+2021-11-18 01:20:50,743 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 1.77 sec
+2021-11-18 01:20:57,107 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 2.86 sec
+MapReduce Total cumulative CPU time: 2 seconds 860 msec
+Ended Job = job_1637177478055_0001
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 2.86 sec   HDFS Read: 6975 HDFS Write: 2 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 860 msec
+OK
+5
+Time taken: 30.68 seconds, Fetched: 1 row(s)
+hive> select * from office.employee where Salary > 20000;
+OK
+10001	Rose	IT	2012	26000
+10002	Sam	Sales	2012	22000
+10003	Mike	HR	2013	30000
+10005	John	Fin	2014	27000
+Time taken: 0.362 seconds, Fetched: 4 row(s)
+hive> select * from office.employee where Salary > 25000;
+OK
+10001	Rose	IT	2012	26000
+10003	Mike	HR	2013	30000
+10005	John	Fin	2014	27000
+Time taken: 0.192 seconds, Fetched: 3 row(s)
+hive> alter table office.employees RENAME TO office.emp;
+OK
+Time taken: 0.189 seconds
+hive> show tables;
+OK
+emp
+Time taken: 0.043 seconds, Fetched: 1 row(s)
+hive> drop table emp;
+OK
+Time taken: 0.219 seconds
+hive> show tables;
+OK
+Time taken: 0.016 seconds
+hive> create table customers
+    > (ID INT, Name STRING,Age INT, Address STRING,Salary INT)
+    > row format delimited fields terminated by ','
+    >  tblproperties("skip.header.line.count"="1")
+    > ;
+OK
+Time taken: 0.095 seconds
+hive> LOAD DATA LOCAL INPATH
+    > '/home/hduser/Downloads/sharedfolder/Customer.csv'
+    > INTO TABLE customers
+    > ;
+Loading data to table office.customers
+Table office.customers stats: [numFiles=1, totalSize=201]
+OK
+Time taken: 0.312 seconds
+hive> show tables;
+OK
+customers
+Time taken: 0.013 seconds, Fetched: 1 row(s)
+hive> select * from customers;
+OK
+1	Rony	32	New York	2000
+2	Kate	25	Florida	1500
+3	Kim	23	Seattle	2000
+4	Clay	25	Boston	6500
+5	Henry	27	California	8500
+6	Kit	22	Chicago	4500
+7	Muffy	24	New York	10000
+Time taken: 0.16 seconds, Fetched: 7 row(s)
+hive> alter table office.customers RENAME TO office.custs;
+OK
+Time taken: 0.164 seconds
+hive> show tables;
+OK
+custs
+Time taken: 0.013 seconds, Fetched: 1 row(s)
+hive> create table orders
+    > (OID INT, Order_date Date,customer_id INT,Amount INT)
+    > row format delimited fields terminated by ','
+    >  tblproperties("skip.header.line.count"="1")
+    > ;
+OK
+Time taken: 0.09 seconds
+hive> LOAD DATA LOCAL INPATH
+    > '/home/hduser/Downloads/sharedfolder/order.csv'
+    > INTO TABLE orders
+    > ;
+Loading data to table office.orders
+Table office.orders stats: [numFiles=1, totalSize=121]
+OK
+Time taken: 0.466 seconds
+hive> select * from orders;
+OK
+102	08-08-2018	3	3000
+100	03-08-2018	3	1500
+101	02-11-2018	2	1560
+103	08-11-2018	4	2060
+Time taken: 0.094 seconds, Fetched: 4 row(s)
+hive> show tables;
+OK
+orders
+custs
+Time taken: 0.013 seconds, Fetched: 1 row(s)
+

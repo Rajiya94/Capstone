@@ -1,0 +1,25 @@
+hduser@hduser-VirtualBox:~$ sh Downloads/mountsf
+[sudo] password for hduser: 
+hduser@hduser-VirtualBox:~$ start-dfs.sh
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-namenode-hduser-VirtualBox.out
+localhost: starting datanode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-datanode-hduser-VirtualBox.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-secondarynamenode-hduser-VirtualBox.out
+hduser@hduser-VirtualBox:~$ start-yarn.sh
+starting yarn daemons
+starting resourcemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-resourcemanager-hduser-VirtualBox.out
+localhost: starting nodemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-nodemanager-hduser-VirtualBox.out
+hduser@hduser-VirtualBox:~$ jupyter notebook
+[I 14:51:33.517 NotebookApp] Writing notebook server cookie secret to /run/user/1000/jupyter/notebook_cookie_secret
+[I 14:51:35.579 NotebookApp] Serving notebooks from local directory: /home/hduser
+[I 14:51:35.583 NotebookApp] The Jupyter Notebook is running at:
+[I 14:51:35.583 NotebookApp] http://localhost:8888/?token=322ab23854ef1701e5580327ed8726d7b1ccec8b13d3081b
+[I 14:51:35.583 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 14:51:35.584 NotebookApp] 
+    
+    Copy/paste this URL into your browser when you connect for the first time,
+    to login with a token:
+        http://localhost:8888/?token=322ab23854ef1701e5580327ed8726d7b1ccec8b13d3081b
+[I 14:51:46.507 NotebookApp] Accepting one-time-token-authenticated connection from 127.0.0.1
+It opens the jupyter notebook

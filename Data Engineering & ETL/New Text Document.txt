@@ -1,0 +1,885 @@
+***************************************
+Creating table and storing as parquet to reduce the file size 
+***************************************
+
+hduser@hduser-VirtualBox:~$ hive
+
+Logging initialized using configuration in jar:file:/usr/local/hive/lib/hive-common-1.2.2.jar!/hive-log4j.properties
+hive> show databases;
+OK
+default
+nyse
+office
+Time taken: 0.4 seconds, Fetched: 3 row(s)
+hive> use nyse;
+OK
+Time taken: 0.8 seconds
+hive> show tables;
+OK
+json2
+json3
+newnyse
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedividends
+ssg1
+stugrades
+Time taken: 0.09 seconds, Fetched: 11 row(s)
+hive > 
+
+
+
+
+
+
+
+
+
+
+
+
+
+hive (nyse)> create table nysedailypq(stexchange String,stock_symbol String, stock_date String, stock_price_open double, 
+           > stock_price_high double,stock_price_low double, stock_price_close double,stock_volume double, stock_price_adj_close double)
+           > stored as parquet;
+OK
+Time taken: 0.012 seconds
+hive> show tables;
+OK
+json2
+json3
+newnyse
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedailypq
+nysedividends
+ssg1
+stugrades
+Time taken: 0.10 seconds, Fetched: 11 row(s)
+hive (nyse)> describe formatted nysedailypq;
+OK
+# col_name            	data_type           	comment             
+	 	 
+stexchange          	string              	                    
+stock_symbol        	string              	                    
+stock_date          	string              	                    
+stock_price_open    	double              	                    
+stock_price_high    	double              	                    
+stock_price_low     	double              	                    
+stock_price_close   	double              	                    
+stock_volume        	double              	                    
+stock_price_adj_close	double              	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	nyse                	 
+Owner:              	hduser              	 
+CreateTime:         	Mon Nov 22 15:36:48 IST 2021	 
+LastAccessTime:     	UNKNOWN             	 
+Protect Mode:       	None                	 
+Retention:          	0                   	 
+Location:           	hdfs://localhost:54310/user/hive/warehouse/nyse.db/nysedailypq	 
+Table Type:         	MANAGED_TABLE       	 
+Table Parameters:	 	 
+	COLUMN_STATS_ACCURATE	true                
+	numFiles            	1                   
+	numRows             	171430              
+	rawDataSize         	1542870             
+	totalSize           	2954871             
+	transient_lastDdlTime	1637575810          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe	 
+InputFormat:        	org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	serialization.format	1                   
+Time taken: 0.113 seconds, Fetched: 39 row(s)
+hive (nyse)> select * from nysedaily;
+OK
+..........
+NYSE	JQC	7/2/2003	15.07	15.1	15.04	15.04	301100.0	8.24
+NYSE	JQC	7/1/2003	15.05	15.11	15.01	15.03	306000.0	8.24
+NYSE	JQC	6/30/2003	15.08	15.08	15.01	15.01	173700.0	8.22
+NYSE	JQC	6/27/2003	15.08	15.13	15.01	15.08	226700.0	8.26
+Time taken: 0.34 seconds, Fetched: 171430 row(s)
+hive (nyse)> insert into nysedailypq select * from nysedaily;
+Query ID = hduser_20211122153948_90bfffff-53cd-4cd8-8697-cca950853a27
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0001, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0001/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2021-11-22 15:39:59,386 Stage-1 map = 0%,  reduce = 0%
+2021-11-22 15:40:07,762 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.32 sec
+MapReduce Total cumulative CPU time: 3 seconds 320 msec
+Ended Job = job_1637575315671_0001
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hive/warehouse/nyse.db/nysedailypq/.hive-staging_hive_2021-11-22_15-39-48_264_2028522612837844612-1/-ext-10000
+Loading data to table nyse.nysedailypq
+Table nyse.nysedailypq stats: [numFiles=1, numRows=171430, totalSize=2954871, rawDataSize=1542870]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 3.32 sec   HDFS Read: 9282351 HDFS Write: 2954952 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 320 msec
+OK
+Time taken: 22.0 seconds
+
+***************************************
+hduser@hduser-VirtualBox:~$ hadoop fs -ls /user/hive/warehouse/nyse.db/nysedailypq
+Found 1 items
+-rwxrwxr-x   1 hduser supergroup    2954871 2021-11-22 15:40 /user/hive/warehouse/nyse.db/nysedailypq/000000_0
+hduser@hduser-VirtualBox:~$ hadoop fs -ls /user/hive/warehouse/nyse.db/nysedailyFound 1 items
+-rwxrwxr-x   1 hduser supergroup    9277046 2021-11-16 15:42 /user/hive/warehouse/nyse.db/nysedaily/NYSE_daily.tsv
+
+# The parquet file size is less when comapred to tsv file because parquets stores in column format.
+***************************************
+
+hive (nyse)> create table nysedividendspq stored as parquet as select * from nysedividends;
+Query ID = hduser_20211122155029_f3136046-93fe-41cb-9764-886383124b73
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0002, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0002/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2021-11-22 15:50:36,230 Stage-1 map = 0%,  reduce = 0%
+2021-11-22 15:50:42,477 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 1.36 sec
+MapReduce Total cumulative CPU time: 1 seconds 360 msec
+Ended Job = job_1637575315671_0002
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hive/warehouse/nyse.db/.hive-staging_hive_2021-11-22_15-50-29_134_4146604849150241503-1/-ext-10001
+Moving data to: hdfs://localhost:54310/user/hive/warehouse/nyse.db/nysedividendspq
+Table nyse.nysedividendspq stats: [numFiles=1, numRows=2215, totalSize=22110, rawDataSize=8860]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 1.36 sec   HDFS Read: 61378 HDFS Write: 22190 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 360 msec
+OK
+Time taken: 14.698 seconds
+hive (nyse)> show tables;
+OK
+json2
+json3
+newnyse
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedailypq
+nysedividends
+nysedividendspq
+ssg1
+stugrades
+Time taken: 0.033 seconds, Fetched: 11 row(s)
+hive (nyse)> select a.stock_symbol, a.stock_price_close, b.dividends, b.divstock_date from nysedaily a join nysedividends b on a.stock_symbol=b.divstock_symbol AND a.stock_date=b.divstock_date where a.stock_price_close>=20;
+Query ID = hduser_20211122155445_aef2339e-cd17-45fd-8c00-2829b75a9b12
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211122155445_aef2339e-cd17-45fd-8c00-2829b75a9b12.log
+2021-11-22 15:54:48	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 15:54:49	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/a26d3838-fc5f-401b-ad30-7d32e8f97b32/hive_2021-11-22_15-54-45_296_362574159957463887-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable
+2021-11-22 15:54:49	Uploaded 1 File to: file:/tmp/hduser/a26d3838-fc5f-401b-ad30-7d32e8f97b32/hive_2021-11-22_15-54-45_296_362574159957463887-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable (89595 bytes)
+2021-11-22 15:54:49	End of local task; Time Taken: 1.432 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0003, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0003/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0003
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-22 15:54:57,474 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 15:55:03,626 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 2.07 sec
+MapReduce Total cumulative CPU time: 2 seconds 70 msec
+Ended Job = job_1637575315671_0003
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 2.07 sec   HDFS Read: 9285325 HDFS Write: 26307 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 70 msec
+OK
+JEF	24.86	0.125	11/13/2007
+JEF	24.79	0.125	8/13/2007
+JEF	32.05	0.125	5/11/2007
+JEF	28.35	0.125	2/13/2007
+JEF	29.44	0.125	11/13/2006
+.....
+JTX	20.32	0.07	3/24/2005
+JTX	24.75	0.07	12/22/2004
+JTX	21.13	0.07	9/23/2004
+Time taken: 20.431 seconds, Fetched: 1012 row(s)
+hive (nyse)> select a.stock_symbol, a.stock_price_close, b.dividends, b.divstock_date from nysedailypq a join nysedividendspq b on a.stock_symbol=b.divstock_symbol AND a.stock_date=b.divstock_date where a.stock_price_close>=20;
+Query ID = hduser_20211122155614_c2eddc66-ad98-4c93-a33f-c30759f36451
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211122155614_c2eddc66-ad98-4c93-a33f-c30759f36451.log
+2021-11-22 15:56:17	Starting to launch local task to process map join;	maximum memory = 518979584
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2021-11-22 15:56:18	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/a26d3838-fc5f-401b-ad30-7d32e8f97b32/hive_2021-11-22_15-56-14_380_1903276487777966237-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile11--.hashtable
+2021-11-22 15:56:18	Uploaded 1 File to: file:/tmp/hduser/a26d3838-fc5f-401b-ad30-7d32e8f97b32/hive_2021-11-22_15-56-14_380_1903276487777966237-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile11--.hashtable (89595 bytes)
+2021-11-22 15:56:18	End of local task; Time Taken: 1.544 sec.
+22 Nov, 2021 3:56:18 PM WARNING: parquet.hadoop.ParquetRecordReader: Can not initialize counter due to context is not a instance of TaskInputOutputContext, but is org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
+22 Nov, 2021 3:56:18 PM INFO: parquet.hadoop.InternalParquetRecordReader: RecordReader initialized will read a total of 2215 records.
+22 Nov, 2021 3:56:18 PM INFO: parquet.hadoop.InternalParquetRecordReader: at row 0. reading next block
+22 Nov, 2021 3:56:18 PM INFO: parquet.hadoop.InternalParquetRecordReader: block read in memory in 17 ms. row count = 2215
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0004, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0004/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0004
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-22 15:56:25,019 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 15:56:32,280 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 2.31 sec
+MapReduce Total cumulative CPU time: 2 seconds 310 msec
+Ended Job = job_1637575315671_0004
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 2.31 sec   HDFS Read: 826836 HDFS Write: 26307 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 310 msec
+OK
+JEF	24.86	0.125	11/13/2007
+JEF	24.79	0.125	8/13/2007
+JEF	32.05	0.125	5/11/2007
+JEF	28.35	0.125	2/13/2007
+JEF	29.44	0.125	11/13/2006
+JEF	24.82	0.125	8/11/2006
+JEF	29.6	0.063	5/23/2006
+.........
+JTX	20.32	0.07	3/24/2005
+JTX	24.75	0.07	12/22/2004
+JTX	21.13	0.07	9/23/2004
+Time taken: 18.955 seconds, Fetched: 1012 row(s)
+
+# Both files have same content but the file storage size is less for parquet.
+
+***************************************
+NYSE Views
+***************************************
+
+hive> describe nysedividends;
+OK
+col_name	data_type	comment
+divexchange         	string              	                    
+divstock_symbol     	string              	                    
+divstock_date       	string              	                    
+dividends           	double              	                    
+Time taken: 0.215 seconds, Fetched: 4 row(s)
+hive> select * from nysedividends;
+OK
+nysedividends.divexchange	nysedividends.divstock_symbol	nysedividends.divstock_date	nysedividends.dividends
+NYSE	JAH	12/30/2009	0.075
+NYSE	JAH	9/29/2009	0.075
+NYSE	JGT	12/11/2009	0.377
+NYSE	JGT	9/11/2009	0.377
+NYSE	JGT	6/11/2009	0.377
+.......
+NYSE	JCE	12/12/2007	0.43
+NYSE	JCE	9/12/2007	0.43
+NYSE	JCE	6/13/2007	0.43
+Time taken: 0.169 seconds, Fetched: 2215 row(s)
+
+# Create a view in Hive based on NYSE daily and dividends data
+
+hive> set hive.cli.print.header=true;
+hive> create view vw1 as select a.stock_symbol,b.divstock_date,b.dividends,a.stock_volume,a.stock_price_adj_close from nysedaily a join nysedividends b on a.stock_symbol=b.divstock_symbol AND a.stock_date=b.divstock_date;
+OK
+Time taken: 1.413 seconds
+
+
+hive> select * from vw1;
+Query ID = hduser_20211122173851_d3f00c41-994f-48ad-b6fb-08086d09e1ae
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211122173851_d3f00c41-994f-48ad-b6fb-08086d09e1ae.log
+2021-11-22 17:38:56	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 17:38:59	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-38-51_226_9170349263906079043-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile31--.hashtable
+2021-11-22 17:38:59	Uploaded 1 File to: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-38-51_226_9170349263906079043-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile31--.hashtable (89595 bytes)
+2021-11-22 17:38:59	End of local task; Time Taken: 2.235 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0011, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0011/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0011
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-22 17:39:11,118 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 17:39:20,633 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 3.41 sec
+MapReduce Total cumulative CPU time: 3 seconds 410 msec
+Ended Job = job_1637575315671_0011
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 3.41 sec   HDFS Read: 9285327 HDFS Write: 75346 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 410 msec
+OK
+vw1.stock_symbol	vw1.divstock_date	vw1.dividends	vw1.stock_volumevw1.stock_price_adj_close
+JEF	5/13/2008	0.125	1595800.0	17.75
+JEF	2/13/2008	0.125	1158400.0	18.73
+JEF	11/13/2007	0.125	1488700.0	24.52
+JEF	8/13/2007	0.125	1646400.0	24.33
+JEF	5/11/2007	0.125	2019500.0	31.3
+........
+JQC	10/10/2003	0.098	188800.0	8.02
+JQC	9/11/2003	0.098	185900.0	7.79
+JQC	8/14/2003	0.098	149500.0	7.75
+Time taken: 31.658 seconds, Fetched: 2215 row(s)
+
+# Provide a report that lists – company symbol, dividends-issue date, dividends issued, volume traded, and adjusted-close-price.
+
+hive> select * from vw1 limit 10;
+Query ID = hduser_20211122174028_41215301-2a5f-4e23-b33c-cd071197b342
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211122174028_41215301-2a5f-4e23-b33c-cd071197b342.log
+2021-11-22 17:40:33	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 17:40:35	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-40-28_620_4522017490569828848-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile41--.hashtable
+2021-11-22 17:40:35	Uploaded 1 File to: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-40-28_620_4522017490569828848-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile41--.hashtable (89595 bytes)
+2021-11-22 17:40:35	End of local task; Time Taken: 2.144 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637575315671_0012, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0012/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0012
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-22 17:40:45,219 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 17:40:52,557 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.57 sec
+MapReduce Total cumulative CPU time: 1 seconds 570 msec
+Ended Job = job_1637575315671_0012
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 1.57 sec   HDFS Read: 78048 HDFS Write: 356 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 570 msec
+OK
+vw1.stock_symbol	vw1.divstock_date	vw1.dividends	vw1.stock_volumevw1.stock_price_adj_close
+JEF	5/13/2008	0.125	1595800.0	17.75
+JEF	2/13/2008	0.125	1158400.0	18.73
+JEF	11/13/2007	0.125	1488700.0	24.52
+JEF	8/13/2007	0.125	1646400.0	24.33
+JEF	5/11/2007	0.125	2019500.0	31.3
+JEF	2/13/2007	0.125	519200.0	27.57
+JEF	11/13/2006	0.125	467000.0	28.51
+JEF	8/11/2006	0.125	385600.0	23.93
+JEF	5/23/2006	0.063	1009300.0	28.4
+JEF	2/13/2006	0.075	511200.0	25.25
+Time taken: 25.198 seconds, Fetched: 10 row(s)
+
+# Report the top 5 companies that issued highest dividends
+
+hive> select stock_symbol,max(dividends) as high_div from vw1 group by stock_symbol order by high_div desc limit 5;
+Query ID = hduser_20211122172652_203d514e-b3e3-41c2-afd7-38d2a7ff356e
+Total jobs = 2
+Execution log at: /tmp/hduser/hduser_20211122172652_203d514e-b3e3-41c2-afd7-38d2a7ff356e.log
+2021-11-22 17:26:58	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 17:26:59	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-26-52_482_9078533514947947748-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile01--.hashtable
+2021-11-22 17:26:59	Uploaded 1 File to: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-26-52_482_9078533514947947748-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile01--.hashtable (89595 bytes)
+2021-11-22 17:26:59	End of local task; Time Taken: 1.884 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0005, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0005/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0005
+Hadoop job information for Stage-2: number of mappers: 1; number of reducers: 1
+2021-11-22 17:27:11,262 Stage-2 map = 0%,  reduce = 0%
+2021-11-22 17:27:21,372 Stage-2 map = 100%,  reduce = 0%, Cumulative CPU 3.07 sec
+2021-11-22 17:27:28,863 Stage-2 map = 100%,  reduce = 100%, Cumulative CPU 4.44 sec
+MapReduce Total cumulative CPU time: 4 seconds 440 msec
+Ended Job = job_1637575315671_0005
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0006, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0006/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0006
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 1
+2021-11-22 17:27:47,182 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 17:27:54,628 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.01 sec
+2021-11-22 17:28:02,138 Stage-3 map = 100%,  reduce = 100%, Cumulative CPU 2.19 sec
+MapReduce Total cumulative CPU time: 2 seconds 190 msec
+Ended Job = job_1637575315671_0006
+MapReduce Jobs Launched: 
+Stage-Stage-2: Map: 1  Reduce: 1   Cumulative CPU: 4.44 sec   HDFS Read: 9289701 HDFS Write: 2117 SUCCESS
+Stage-Stage-3: Map: 1  Reduce: 1   Cumulative CPU: 2.19 sec   HDFS Read: 6825 HDFS Write: 52 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 630 msec
+OK
+stock_symbol	high_div
+JEF	10.07825
+JOE	9.386
+JFC	5.228
+JXI	1.408
+JHX	1.25
+Time taken: 71.978 seconds, Fetched: 5 row(s)
+
+# Report the top 5 companies that has highest volume traded
+
+hive> select stock_symbol,max(stock_volume) as high_vol from vw1 group by stock_symbol order by high_vol desc limit 5;
+Query ID = hduser_20211122173039_9c09d619-26b3-4a54-a5bc-f5c9c3ba50a1
+Total jobs = 2
+Execution log at: /tmp/hduser/hduser_20211122173039_9c09d619-26b3-4a54-a5bc-f5c9c3ba50a1.log
+2021-11-22 17:30:43	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 17:30:45	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-30-39_021_1831059357235071919-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile11--.hashtable
+2021-11-22 17:30:46	Uploaded 1 File to: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-30-39_021_1831059357235071919-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile11--.hashtable (69565 bytes)
+2021-11-22 17:30:46	End of local task; Time Taken: 2.58 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0007, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0007/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0007
+Hadoop job information for Stage-2: number of mappers: 1; number of reducers: 1
+2021-11-22 17:30:57,005 Stage-2 map = 0%,  reduce = 0%
+2021-11-22 17:31:07,553 Stage-2 map = 100%,  reduce = 0%, Cumulative CPU 3.45 sec
+2021-11-22 17:31:14,964 Stage-2 map = 100%,  reduce = 100%, Cumulative CPU 4.6 sec
+MapReduce Total cumulative CPU time: 4 seconds 600 msec
+Ended Job = job_1637575315671_0007
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0008, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0008/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0008
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 1
+2021-11-22 17:31:29,890 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 17:31:37,342 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.07 sec
+2021-11-22 17:31:44,731 Stage-3 map = 100%,  reduce = 100%, Cumulative CPU 2.31 sec
+MapReduce Total cumulative CPU time: 2 seconds 310 msec
+Ended Job = job_1637575315671_0008
+MapReduce Jobs Launched: 
+Stage-Stage-2: Map: 1  Reduce: 1   Cumulative CPU: 4.6 sec   HDFS Read: 9289962 HDFS Write: 2117 SUCCESS
+Stage-Stage-3: Map: 1  Reduce: 1   Cumulative CPU: 2.31 sec   HDFS Read: 6831 HDFS Write: 71 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 910 msec
+OK
+stock_symbol	high_vol
+JPM	1.318408E8
+JNJ	3.08022E7
+JCI	2.83642E7
+JCP	1.36063E7
+JWN	1.35323E7
+Time taken: 67.04 seconds, Fetched: 5 row(s)
+
+# Report the top 5 companies that had highest adjusted-close-price
+
+hive> select stock_symbol,max(stock_price_adj_close) as high_adj_cp from vw1 group by stock_symbol order by high_adj_cp desc limit 5;
+Query ID = hduser_20211122173246_0d682a6a-9ebb-4a1d-aec9-babc1a0242fa
+Total jobs = 2
+Execution log at: /tmp/hduser/hduser_20211122173246_0d682a6a-9ebb-4a1d-aec9-babc1a0242fa.log
+2021-11-22 17:32:51	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-22 17:32:53	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-32-46_367_294585849762831688-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile21--.hashtable
+2021-11-22 17:32:53	Uploaded 1 File to: file:/tmp/hduser/f8d3b0ab-56af-41ad-8de0-60d46a89a234/hive_2021-11-22_17-32-46_367_294585849762831688-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile21--.hashtable (69565 bytes)
+2021-11-22 17:32:53	End of local task; Time Taken: 2.398 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0009, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0009/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0009
+Hadoop job information for Stage-2: number of mappers: 1; number of reducers: 1
+2021-11-22 17:33:05,007 Stage-2 map = 0%,  reduce = 0%
+2021-11-22 17:33:14,483 Stage-2 map = 100%,  reduce = 0%, Cumulative CPU 3.22 sec
+2021-11-22 17:33:23,014 Stage-2 map = 100%,  reduce = 100%, Cumulative CPU 4.53 sec
+MapReduce Total cumulative CPU time: 4 seconds 530 msec
+Ended Job = job_1637575315671_0009
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0010, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0010/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0010
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 1
+2021-11-22 17:33:40,188 Stage-3 map = 0%,  reduce = 0%
+2021-11-22 17:33:50,758 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.19 sec
+2021-11-22 17:33:58,094 Stage-3 map = 100%,  reduce = 100%, Cumulative CPU 2.36 sec
+MapReduce Total cumulative CPU time: 2 seconds 360 msec
+Ended Job = job_1637575315671_0010
+MapReduce Jobs Launched: 
+Stage-Stage-2: Map: 1  Reduce: 1   Cumulative CPU: 4.53 sec   HDFS Read: 9290022 HDFS Write: 2117 SUCCESS
+Stage-Stage-3: Map: 1  Reduce: 1   Cumulative CPU: 2.36 sec   HDFS Read: 6849 HDFS Write: 51 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 890 msec
+OK
+stock_symbol	high_adj_cp
+JRT	171.9
+JLL	113.85
+JKH	99.03
+JKJ	91.16
+JKG	88.12
+Time taken: 73.184 seconds, Fetched: 5 row(s)
+
+***************************************
+Batting Scores in hive
+***************************************
+
+# Load this data into Hive table
+
+hive> create table batting (playerID String, yearID String, stint int ,teamID string, lgID String ,G int ,G_batting int ,AB int, R int, H int, B2 int , B3 int ,HR int ,RBI int, SB int, CS int ,BB int, SO int,IBB int ,HBP int ,SH int ,SF int ,GIDP int, G_old int) row format delimited fields terminated BY ',' lines terminated BY '\n' tblproperties("skip.header.line.count"="1");
+OK
+Time taken: 0.549 seconds
+hive> LOAD DATA LOCAL INPATH '/home/hduser/Downloads/sharedfolder/Batting.csv' INTO TABLE batting;
+Loading data to table default.batting
+Table default.batting stats: [numFiles=1, totalSize=6303794]
+OK
+Time taken: 0.943 seconds
+hive> show tables;
+OK
+batting
+nysedaily_bucket
+nysedaily_part
+nysedaily_part1
+Time taken: 0.112 seconds, Fetched: 4 row(s)
+hive> select * from batting limit 10;
+OK
+aardsda01	2004	1	SFN	NL	11	11	0	0	0	00	0	0	0	0	0	0	0	0	0	0	011
+aardsda01	2006	1	CHN	NL	45	43	2	0	0	00	0	0	0	0	0	0	0	0	1	0	045
+aardsda01	2007	1	CHA	AL	25	2	0	0	0	00	0	0	0	0	0	0	0	0	0	0	02
+aardsda01	2008	1	BOS	AL	47	5	1	0	0	00	0	0	0	0	0	1	0	0	0	0	05
+aardsda01	2009	1	SEA	AL	73	3	0	0	0	00	0	0	0	0	0	0	0	0	0	0	0NULL
+aardsda01	2010	1	SEA	AL	53	4	0	0	0	00	0	0	0	0	0	0	0	0	0	0	0NULL
+aaronha01	1954	1	ML1	NL	122	122	468	58	131	27	6	13	69	2	2	28	39	NULL	3	6	413	122
+aaronha01	1955	1	ML1	NL	153	153	602	105	189	37	9	27	106	3	1	49	61	5	3	7	420	153
+aaronha01	1956	1	ML1	NL	153	153	609	106	200	34	14	26	92	2	4	37	54	6	2	5	721	153
+aaronha01	1957	1	ML1	NL	151	151	615	118	198	27	6	44	132	1	1	57	58	15	0	0	313	151
+Time taken: 0.404 seconds, Fetched: 10 row(s)
+
+# Display list of the yearIDs and the maximum Runs scored in each yearID.
+
+hive> select yearid,max(R) from Batting group by yearid;
+Query ID = hduser_20211122195409_8b48a70a-0a05-491f-b67c-768176cb550e
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0020, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0020/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0020
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-22 19:54:20,257 Stage-1 map = 0%,  reduce = 0%
+2021-11-22 19:54:28,579 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.01 sec
+2021-11-22 19:54:34,825 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 3.29 sec
+MapReduce Total cumulative CPU time: 3 seconds 290 msec
+Ended Job = job_1637575315671_0020
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 3.29 sec   HDFS Read: 6312955 HDFS Write: 1256 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 290 msec
+OK
+1871	66
+1872	94
+1873	125
+1874	91
+1875	115
+.....
+2009	124
+2010	115
+2011	136
+Time taken: 27.5 seconds, Fetched: 141 row(s)
+
+# Display the playerID, yearID and maximum Runs scored by the player in each year played.
+
+hive> select playerid,yearid,max(R) from Batting group by yearid,playerid;
+OK
+.....
+zimmery01	2011	52
+zitoba01	2011	0
+zobribe01	2011	99
+Time taken: 27.977 seconds, Fetched: 88318 row(s)
+
+# List each yearID and the number of centuries scored in the year.
+
+hive> Select YearID, Count(R) from batting where R>=100 group by YearID;
+Query ID = hduser_20211122195658_6c50f512-394a-4b2a-ac20-84d3829dabf3
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0021, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0021/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0021
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-22 19:57:08,582 Stage-1 map = 0%,  reduce = 0%
+2021-11-22 19:57:15,813 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.25 sec
+2021-11-22 19:57:25,351 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 3.93 sec
+MapReduce Total cumulative CPU time: 3 seconds 930 msec
+Ended Job = job_1637575315671_0021
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 3.93 sec   HDFS Read: 6312651 HDFS Write: 981 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 930 msec
+OK
+1873	1
+1875	2
+1876	1
+1883	6
+1884	21
+....
+2009	22
+2010	17
+2011	16
+Time taken: 28.337 seconds, Fetched: 128 row(s)
+
+# Display the teamID, yearID and the number centuries scored by the team in the year.
+
+hive> Select teamid,YearID, Count(R) from batting where R>=100 group by YearID,teamid;
+Query ID = hduser_20211122195958_4ac354ed-43bb-4b2b-84ae-66b4fc755e7a
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637575315671_0022, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637575315671_0022/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637575315671_0022
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-22 20:00:07,095 Stage-1 map = 0%,  reduce = 0%
+2021-11-22 20:00:16,561 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.16 sec
+2021-11-22 20:00:23,935 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 3.7 sec
+MapReduce Total cumulative CPU time: 3 seconds 700 msec
+Ended Job = job_1637575315671_0022
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 3.7 sec   HDFS Read: 6313332 HDFS Write: 12815 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 700 msec
+OK
+BS1	1873	1
+BS1	1875	2
+CHN	1876	1
+BFN	1883	1
+BSN	1883	2
+....
+SLN	2011	1
+TEX	2011	1
+TOR	2011	1
+Time taken: 26.934 seconds, Fetched: 1165 row(s)
+
+***************************************
+Batting Scores in pyspark
+***************************************
+
+hduser@hduser-VirtualBox:~$ pyspark
+Python 3.5.2 (default, Nov 23 2017, 16:37:01) 
+[GCC 5.4.0 20160609] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+21/11/22 20:17:58 WARN Utils: Your hostname, hduser-VirtualBox resolves to a loopback address: 127.0.1.1; using 192.168.244.128 instead (on interface ens33)
+21/11/22 20:17:58 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+21/11/22 20:18:00 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+21/11/22 20:18:09 WARN ObjectStore: Failed to get database global_temp, returning NoSuchObjectException
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.2.2
+      /_/
+
+Using Python version 3.5.2 (default, Nov 23 2017 16:37:01)
+SparkSession available as 'spark'.
+
+# Load this data into Hive table.
+
+>>> spark.read.csv("/home/hduser/Downloads/sharedfolder/Batting.csv").show()+---------+------+-----+------+----+---+---------+---+---+---+----+----+----+----+----+----+----+----+----+----+----+----+----+-----+
+|      _c0|   _c1|  _c2|   _c3| _c4|_c5|      _c6|_c7|_c8|_c9|_c10|_c11|_c12|_c13|_c14|_c15|_c16|_c17|_c18|_c19|_c20|_c21|_c22| _c23|
++---------+------+-----+------+----+---+---------+---+---+---+----+----+----+----+----+----+----+----+----+----+----+----+----+-----+
+| playerID|yearID|stint|teamID|lgID|  G|G_batting| AB|  R|  H|  2B|  3B|  HR| RBI|  SB|  CS|  BB|  SO| IBB| HBP|  SH|  SF|GIDP|G_old|
+|aardsda01|  2004|    1|   SFN|  NL| 11|       11|  0|  0|  0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   11|
+|aardsda01|  2006|    1|   CHN|  NL| 45|       43|  2|  0|  0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   1|   0|   0|   45|
+|aardsda01|  2007|    1|   CHA|  AL| 25|        2|  0|  0|  0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|    2|
+|aardsda01|  2008|    1|   BOS|  AL| 47|        5|  1|  0|  0|   0|   0|   0|   0|   0|   0|   0|   1|   0|   0|   0|   0|   0|    5|
+|aardsda01|  2009|    1|   SEA|  AL| 73|        3|  0|  0|  0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0| null|
+|aardsda01|  2010|    1|   SEA|  AL| 53|        4|  0|  0|  0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0|   0| null|
+|aaronha01|  1954|    1|   ML1|  NL|122|      122|468| 58|131|  27|   6|  13|  69|   2|   2|  28|  39|null|   3|   6|   4|  13|  122|
+|aaronha01|  1955|    1|   ML1|  NL|153|      153|602|105|189|  37|   9|  27| 106|   3|   1|  49|  61|   5|   3|   7|   4|  20|  153|
+|aaronha01|  1956|    1|   ML1|  NL|153|      153|609|106|200|  34|  14|  26|  92|   2|   4|  37|  54|   6|   2|   5|   7|  21|  153|
+|aaronha01|  1957|    1|   ML1|  NL|151|      151|615|118|198|  27|   6|  44| 132|   1|   1|  57|  58|  15|   0|   0|   3|  13|  151|
+|aaronha01|  1958|    1|   ML1|  NL|153|      153|601|109|196|  34|   4|  30|  95|   4|   1|  59|  49|  16|   1|   0|   3|  21|  153|
+|aaronha01|  1959|    1|   ML1|  NL|154|      154|629|116|223|  46|   7|  39| 123|   8|   0|  51|  54|  17|   4|   0|   9|  19|  154|
+|aaronha01|  1960|    1|   ML1|  NL|153|      153|590|102|172|  20|  11|  40| 126|  16|   7|  60|  63|  13|   2|   0|  12|   8|  153|
+|aaronha01|  1961|    1|   ML1|  NL|155|      155|603|115|197|  39|  10|  34| 120|  21|   9|  56|  64|  20|   2|   1|   9|  16|  155|
+|aaronha01|  1962|    1|   ML1|  NL|156|      156|592|127|191|  28|   6|  45| 128|  15|   7|  66|  73|  14|   3|   0|   6|  14|  156|
+|aaronha01|  1963|    1|   ML1|  NL|161|      161|631|121|201|  29|   4|  44| 130|  31|   5|  78|  94|  18|   0|   0|   5|  11|  161|
+|aaronha01|  1964|    1|   ML1|  NL|145|      145|570|103|187|  30|   2|  24|  95|  22|   4|  62|  46|   9|   0|   0|   2|  22|  145|
+|aaronha01|  1965|    1|   ML1|  NL|150|      150|570|109|181|  40|   1|  32|  89|  24|   4|  60|  81|  10|   1|   0|   8|  15|  150|
+|aaronha01|  1966|    1|   ATL|  NL|158|      158|603|117|168|  23|   1|  44| 127|  21|   3|  76|  96|  15|   1|   0|   8|  14|  158|
++---------+------+-----+------+----+---+---------+---+---+---+----+----+----+----+----+----+----+----+----+----+----+----+----+-----+
+only showing top 20 rows
+
+>>> spark.read.option("header",True).csv("/home/hduser/Downloads/sharedfolder/Batting.csv").show()
++---------+------+-----+------+----+---+---------+---+---+---+---+---+---+---+---+---+---+---+----+---+---+---+----+-----+
+| playerID|yearID|stint|teamID|lgID|  G|G_batting| AB|  R|  H| 2B| 3B| HR|RBI| SB| CS| BB| SO| IBB|HBP| SH| SF|GIDP|G_old|
++---------+------+-----+------+----+---+---------+---+---+---+---+---+---+---+---+---+---+---+----+---+---+---+----+-----+
+|aardsda01|  2004|    1|   SFN|  NL| 11|       11|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|   0|  0|  0|  0|   0|   11|
+|aardsda01|  2006|    1|   CHN|  NL| 45|       43|  2|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|   0|  0|  1|  0|   0|   45|
+|aardsda01|  2007|    1|   CHA|  AL| 25|        2|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|   0|  0|  0|  0|   0|    2|
+|aardsda01|  2008|    1|   BOS|  AL| 47|        5|  1|  0|  0|  0|  0|  0|  0|  0|  0|  0|  1|   0|  0|  0|  0|   0|    5|
+|aardsda01|  2009|    1|   SEA|  AL| 73|        3|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|   0|  0|  0|  0|   0| null|
+|aardsda01|  2010|    1|   SEA|  AL| 53|        4|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|  0|   0|  0|  0|  0|   0| null|
+|aaronha01|  1954|    1|   ML1|  NL|122|      122|468| 58|131| 27|  6| 13| 69|  2|  2| 28| 39|null|  3|  6|  4|  13|  122|
+|aaronha01|  1955|    1|   ML1|  NL|153|      153|602|105|189| 37|  9| 27|106|  3|  1| 49| 61|   5|  3|  7|  4|  20|  153|
+|aaronha01|  1956|    1|   ML1|  NL|153|      153|609|106|200| 34| 14| 26| 92|  2|  4| 37| 54|   6|  2|  5|  7|  21|  153|
+|aaronha01|  1957|    1|   ML1|  NL|151|      151|615|118|198| 27|  6| 44|132|  1|  1| 57| 58|  15|  0|  0|  3|  13|  151|
+|aaronha01|  1958|    1|   ML1|  NL|153|      153|601|109|196| 34|  4| 30| 95|  4|  1| 59| 49|  16|  1|  0|  3|  21|  153|
+|aaronha01|  1959|    1|   ML1|  NL|154|      154|629|116|223| 46|  7| 39|123|  8|  0| 51| 54|  17|  4|  0|  9|  19|  154|
+|aaronha01|  1960|    1|   ML1|  NL|153|      153|590|102|172| 20| 11| 40|126| 16|  7| 60| 63|  13|  2|  0| 12|   8|  153|
+|aaronha01|  1961|    1|   ML1|  NL|155|      155|603|115|197| 39| 10| 34|120| 21|  9| 56| 64|  20|  2|  1|  9|  16|  155|
+|aaronha01|  1962|    1|   ML1|  NL|156|      156|592|127|191| 28|  6| 45|128| 15|  7| 66| 73|  14|  3|  0|  6|  14|  156|
+|aaronha01|  1963|    1|   ML1|  NL|161|      161|631|121|201| 29|  4| 44|130| 31|  5| 78| 94|  18|  0|  0|  5|  11|  161|
+|aaronha01|  1964|    1|   ML1|  NL|145|      145|570|103|187| 30|  2| 24| 95| 22|  4| 62| 46|   9|  0|  0|  2|  22|  145|
+|aaronha01|  1965|    1|   ML1|  NL|150|      150|570|109|181| 40|  1| 32| 89| 24|  4| 60| 81|  10|  1|  0|  8|  15|  150|
+|aaronha01|  1966|    1|   ATL|  NL|158|      158|603|117|168| 23|  1| 44|127| 21|  3| 76| 96|  15|  1|  0|  8|  14|  158|
+|aaronha01|  1967|    1|   ATL|  NL|155|      155|600|113|184| 37|  3| 39|109| 17|  6| 63| 97|  19|  0|  0|  6|  11|  155|
++---------+------+-----+------+----+---+---------+---+---+---+---+---+---+---+---+---+---+---+----+---+---+---+----+-----+
+only showing top 20 rows
+
+# Display list of the yearIDs and the maximum Runs scored in each yearID.
+
+>>> spark.sql("select yearID,max(R) from batting group by yearID").show()
++------+------+
+|yearID|max(R)|
++------+------+
+|  1903|   137|
+|  1953|   132|
+|  1957|   121|
+|  1897|   152|
+|  1987|   123|
+|  1880|    91|
+|  1956|   132|
+|  1936|   167|
+|  1958|   127|
+|  1910|   110|
+|  1943|   112|
+|  1915|   144|
+|  1972|   122|
+|  1931|   163|
+|  1988|   128|
+|  1911|   147|
+|  1926|   139|
+|  1938|   144|
+|  1918|    86|
+|  1932|   152|
++------+------+
+only showing top 20 rows
+
+# Display the playerID, yearID and maximum Runs scored by the player in each year played.
+
+>>> spark.sql("select playerID,yearID,max(R) from batting group by yearID,playerID").show()
+21/11/22 20:22:52 WARN Executor: Managed memory leak detected; size = 17039360 bytes, TID = 49
++---------+------+------+
+| playerID|yearID|max(R)|
++---------+------+------+
+| abadfe01|  2011|     0|
+|adamsac01|  1946|     0|
+|adamssp01|  1922|     5|
+|alexado01|  1984|  null|
+|allenki01|  1981|     1|
+|allenmy01|  1883|     0|
+|alvaros01|  1959|     0|
+|andermi01|  1972|     8|
+|averiea01|  1934|   128|
+|averyst01|  1991|     4|
+|aybarma01|  2000|     1|
+|baergca01|  1998|    46|
+| baezjo01|  1978|     8|
+|banksbi01|  1896|     0|
+|barlomi01|  1977|  null|
+|barnero01|  1876|   126|
+|bartlbo01|  1943|     0|
+|bastich01|  1890|    38|
+|batismi01|  1992|     0|
+|beattji01|  1986|  null|
++---------+------+------+
+only showing top 20 rows
+
+# List each yearID and the number of centuries scored in the year.
+
+>>> spark.sql("select yearID,count(R) from batting where R>=100 group by yearID").show()
++------+--------+
+|yearID|count(R)|
++------+--------+
+|  1953|      19|
+|  1903|       8|
+|  1957|       8|
+|  1897|      24|
+|  1987|      21|
+|  1956|       9|
+|  1936|      32|
+|  1958|       6|
+|  1910|       4|
+|  1943|       3|
+|  1915|       5|
+|  1972|       6|
+|  1931|      21|
+|  1938|      22|
+|  1911|      13|
+|  1988|      12|
+|  1926|       9|
+|  1932|      25|
+|  1977|      17|
+|  1971|       4|
++------+--------+
+only showing top 20 rows
+
+# Display the teamID, yearID and the number centuries scored by the team in the year
+
+>>> spark.sql("select teamID,yearID,count(R) from batting where R>=100 group by yearID,teamID").show()
++------+------+--------+
+|teamID|yearID|count(R)|
++------+------+--------+
+|   SEA|  2001|       2|
+|   PIT|  1925|       4|
+|   CIN|  1955|       2|
+|   SLN|  2009|       1|
+|   PHI|  1975|       1|
+|   PHA|  1934|       2|
+|   SL4|  1884|       1|
+|   HOU|  1994|       1|
+|   PHI|  1893|       5|
+|   NYA|  1948|       2|
+|   DET|  1936|       3|
+|   OAK|  2000|       3|
+|   PHI|  1998|       2|
+|   ATL|  1983|       1|
+|   BLN|  1892|       2|
+|   DET|  1985|       1|
+|   SLN|  1961|       1|
+|   MIL|  2009|       2|
+|   NY1|  1914|       1|
+|   NY1|  1891|       3|
++------+------+--------+
+only showing top 20 rows

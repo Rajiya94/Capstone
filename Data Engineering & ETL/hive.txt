@@ -1,0 +1,1616 @@
+Script started on Tuesday 16 November 2021 02:46:49 PM IST
+hduser@hduser-VirtualBox: ~$ sudo vmhgfs-fuse .host:/sharedfolder /home/hduser/Dow
+wnloads/sharedfolder/ -o allow_other
+[sudo] password for hduser: hadoop
+hduser@hduser-VirtualBox: ~$ start-dfs.sh
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-namenode-hduser-VirtualBox.out
+localhost: starting datanode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-datanode-hduser-VirtualBox.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop-2.9.1/logs/hadoop-hduser-secondarynamenode-hduser-VirtualBox.out
+hduser@hduser-VirtualBox: ~$ start-yarn.sh
+starting yarn daemons
+starting resourcemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-resourcemanager-hduser-VirtualBox.out
+localhost: starting nodemanager, logging to /usr/local/hadoop-2.9.1/logs/yarn-hduser-nodemanager-hduser-VirtualBox.out
+hduser@hduser-VirtualBox: ~$ jps
+9184 SecondaryNameNode
+9476 NodeManager
+8967 DataNode
+9353 ResourceManager
+8842 NameNode
+9789 Jps
+hduser@hduser-VirtualBox: ~$ hive
+
+Logging initialized using configuration in jar:file:/usr/local/hive/lib/hive-common-1.2.2.jar!/hive-log4j.properties
+
+hive> use office;
+OK
+Time taken: 0.167 seconds
+hive> show tables;
+OK
+custs
+orders
+Time taken: 0.437 seconds, Fetched: 2 row(s)
+hive> select * from orders;
+OK
+102	08-08-2018	3	3000
+100	03-08-2018	3	1500
+101	02-11-2018	2	1560
+103	08-11-2018	4	2060
+Time taken: 1.359 seconds, Fetched: 4 row(s)
+hive> select * from orders LIMIT 1;
+OK
+102	08-08-2018	3	3000
+Time taken: 0.225 seconds, Fetched: 1 row(s)
+hive> select * from custs ;
+OK
+1	Rony	32	New York	2000
+2	kate	25	Florida		1500
+3	Kim	23	Seattle		2000
+4	Clay	25	Boston		6500
+5	henry	27	California	8500
+6	Kit	22	Chicago		4500
+7	Muffy	24	New York	10000
+Time taken: 0.205 seconds, Fetched: 7 row(s)
+hive> select * from custs LIMIT 1;
+OK
+1	Rony	32	New York	2000
+Time taken: 0.205 seconds, Fetched: 1 row(s)
+hive> select * from custs where name='Clay';
+OK
+4	Clay	25	Boston	6500
+Time taken: 0.349 seconds, Fetched: 1 row(s)
+OK
+hive> select name,address from custs where name='Clay';
+Clay	Boston
+Time taken: 0.197 seconds, Fetched: 1 row(s)
+hive> select name,address from custs;
+OK
+Rony	New York
+kate	Florida
+Kim	Seattle
+Clay	Boston
+henry	California
+Kit	Chicago
+Muffy	New York
+Time taken: 0.166 seconds, Fetched: 7 row(s)
+hive> set hive.cli.print.header=true;
+hive> set hive.cli.print.current.db=true;
+hive (office)> select * from custs;
+OK
+custs.id	custs.name	custs.age	custs.address	custs.salary
+1	Rony	32	New York	2000
+2	kate	25	Florida	1500
+3	Kim	23	Seattle	2000
+4	Clay	25	Boston	6500
+5	henry	27	California	8500
+6	Kit	22	Chicago	4500
+7	Muffy	24	New York	10000
+Time taken: 0.129 seconds, Fetched: 7 row(s)
+hive (office)> select name,address from custs;
+OK
+name	address
+Rony	New York
+kate	Florida
+Kim	Seattle
+Clay	Boston
+henry	California
+Kit	Chicago
+Muffy	New York
+Time taken: 0.346 seconds, Fetched: 7 row(s)
+hive (office)> select * from custs where name='Clay';
+OK
+custs.id	custs.name	custs.age	custs.address	custs.salary
+4	Clay	25	Boston	6500
+Time taken: 0.167 seconds, Fetched: 1 row(s)
+hive (office)> select name,address from custs where name='Clay';
+OK
+name	address
+Clay	Boston
+Time taken: 0.237 seconds, Fetched: 1 row(s)
+hive (office)> select * from custs LIMIT 1;
+OK
+custs.id	custs.name	custs.age	custs.address	custs.salary
+1	Rony	32	New York	2000
+Time taken: 0.222 seconds, Fetched: 1 row(s)
+hive (office)> use nyse;
+FAILED: SemanticException [Error 10072]: Database does not exist: nyse
+hive (office)> create database if not exists nyse;
+OK
+Time taken: 0.272 seconds
+hive (office)> use nyse
+OK
+Time taken: 0.053 seconds
+hive (nyse)> show tables;
+OK
+tab_name
+Time taken: 0.023 seconds
+hive (nyse)> create table NYSEdaily
+	>(stexchange String,stock_symbol String,stock_date String,stock_price_open double, stock_price_high double,
+	>stock_price_low double, stock_price_close double, stock_volume double, stock_price_adj_close double)
+	>row format delimited fields terminated by "\t" lines terminated by "\n"
+	>;
+OK
+Time taken: 0.416 seconds
+hive (nyse)> show tables;
+OK
+tab_name
+nysedaily
+Time taken: 0.066 seconds, Fetched: 1 row(s)
+hive (nyse)> describe NYSEdaily;
+OK
+col_name	data_type	comment
+stexchange          	string              	                    
+stock_symbol        	string              	                    
+stock_date          	string              	                    
+stock_price_open    	double              	                    
+stock_price_high    	double              	                    
+stock_price_low     	double              	                    
+stock_price_close   	double              	                    
+stock_volume        	double              	                    
+stock_price_adj_close	double              	                    
+Time taken: 0.219 seconds, Fetched: 9 row(s)
+hive (nyse)> describe formatted nysedaily;
+OK
+col_name	data_type	comment
+# col_name            	data_type           	comment             
+	 	 
+stexchange          	string              	                    
+stock_symbol        	string              	                    
+stock_date          	string              	                    
+stock_price_open    	double              	                    
+stock_price_high    	double              	                    
+stock_price_low     	double              	                    
+stock_price_close   	double              	                    
+stock_volume        	double              	                    
+stock_price_adj_close	double              	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	nyse                	 
+Owner:              	hduser              	 
+CreateTime:         	Tue Nov 16 15:34:52 IST 2021	 
+LastAccessTime:     	UNKNOWN             	 
+Protect Mode:       	None                	 
+Retention:          	0                   	 
+Location:           	hdfs://localhost:54310/user/hive/warehouse/nyse.db/nysedaily	 
+Table Type:         	MANAGED_TABLE       	 
+Table Parameters:	 	 
+	transient_lastDdlTime	1637057092          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	 
+InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	field.delim         	\t                  
+	line.delim          	\n                  
+	serialization.format	\t                  
+Time taken: 0.228 seconds, Fetched: 36 row(s)
+hive (nyse)> load data local inpath
+           > '/home/hduser/nyse/nyse_daily.tsv'
+           > into table NYSEdaily;
+Loading data to table nyse.nysedaily
+Table nyse.nysedaily stats: [numFiles=1, numRows=0, totalSize=9277046, rawDataSize=0]
+OK
+Time taken: 0.823 seconds
+hive (nyse)> select * from NYSEdaily
+           > ;
+OK
+nysedaily.stexchange	nysedaily.stock_symbol	nysedaily.stock_date	nysedaily.stock_price_open	nysedaily.stock_price_high	nysedaily.stock_price_low	nysedaily.stock_price_close	nysedaily.stock_volume	nysedaily.stock_price_adj_close
+NYSE	JEF	2/8/2010	25.4	25.49	24.78	24.82	1134300.0	24.82
+NYSE	JEF	2/5/2010	24.91	25.19	24.08	25.01	1765200.0	25.01
+NYSE	JEF	2/4/2010	26.01	26.2	24.85	24.85	1414400.0	24.85
+NYSE	JEF	2/3/2010	26.23	26.76	26.22	26.29	1066000.0	26.29
+NYSE	JEF	2/2/2010	26.08	26.86	25.78	26.46	1496400.0	26.46
+NYSE	JEC	4/8/1998	32.5	32.81	31.94	32.19	209600.0	8.05
+NYSE	JEC	4/7/1998	32.5	32.94	32.25	32.56	332000.0	8.14
+NYSE	JEC	4/6/1998	32.81	33.0	32.5	32.56	151600.0	8.14
+NYSE	JEC	4/3/1998	32.62	33.0	32.44	32.56	172800.0	8.14
+NYSE	JEC	4/2/1998	32.62	32.88	32.56	32.69	140000.0	8.17
+.......
+NYSE	JQC	7/1/2003	15.05	15.11	15.01	15.03	306000.0	8.24
+NYSE	JQC	6/30/2003	15.08	15.08	15.01	15.01	173700.0	8.22
+NYSE	JQC	6/27/2003	15.08	15.13	15.01	15.08	226700.0	8.26
+Time taken: 0.188 seconds, Fetched: 171430 row(s)
+hive (nyse)> select * from NYSEdaily limit 10;
+OK
+nysedaily.stexchange	nysedaily.stock_symbol	nysedaily.stock_date	nysedaily.stock_price_open	nysedaily.stock_price_high	nysedaily.stock_price_low	nysedaily.stock_price_close	nysedaily.stock_volume	nysedaily.stock_price_adj_close
+NYSE	JEF	2/8/2010	25.4	25.49	24.78	24.82	1134300.0	24.82
+NYSE	JEF	2/5/2010	24.91	25.19	24.08	25.01	1765200.0	25.01
+NYSE	JEF	2/4/2010	26.01	26.2	24.85	24.85	1414400.0	24.85
+NYSE	JEF	2/3/2010	26.23	26.76	26.22	26.29	1066000.0	26.29
+NYSE	JEF	2/2/2010	26.08	26.86	25.78	26.46	1496400.0	26.46
+NYSE	JEF	2/1/2010	25.61	26.11	25.36	26.11	2381800.0	26.11
+NYSE	JEF	1/29/2010	26.57	26.8	25.41	25.54	2010000.0	25.54
+NYSE	JEF	1/28/2010	27.4	27.4	26.35	26.36	1708100.0	26.36
+NYSE	JEF	1/27/2010	26.44	27.15	26.42	27.14	1929700.0	27.14
+NYSE	JEF	1/26/2010	26.68	26.99	26.46	26.5	1422100.0	26.5
+Time taken: 0.134 seconds, Fetched: 10 row(s)
+hive (nyse)> select * from NYSEdaily where stock_symbol='JEF';
+OK
+nysedaily.stexchange	nysedaily.stock_symbol	nysedaily.stock_date	nysedaily.stock_price_open	nysedaily.stock_price_high	nysedaily.stock_price_low	nysedaily.stock_price_close	nysedaily.stock_volume	nysedaily.stock_price_adj_close
+NYSE	JEF	2/8/2010	25.4	25.49	24.78	24.82	1134300.0	24.82
+NYSE	JEF	2/5/2010	24.91	25.19	24.08	25.01	1765200.0	25.01
+NYSE	JEF	2/4/2010	26.01	26.2	24.85	24.85	1414400.0	24.85
+NYSE	JEF	2/3/2010	26.23	26.76	26.22	26.29	1066000.0	26.29
+NYSE	JEF	2/2/2010	26.08	26.86	25.78	26.46	1496400.0	26.46
+.......
+NYSE	JEF	3/30/1990	12.75	13.0	12.5	12.63	128000.0	0.24
+NYSE	JEF	3/29/1990	12.25	13.0	12.25	13.0	137600.0	0.25
+NYSE	JEF	3/28/1990	12.75	12.75	12.25	12.5	161600.0	0.24
+NYSE	JEF	3/27/1990	12.25	12.5	12.25	12.5	56000.0	0.24
+NYSE	JEF	3/26/1990	12.5	12.5	12.5	12.5	3200.0	0.24
+Time taken: 0.176 seconds, Fetched: 5009 row(s)
+hive (nyse)> create table NYSEdividends
+           > (divexchange string, divstock_symbol string, divstock_date string, dividends float)
+           > row format delimited fields terminated by "\t" lines terminated by "\n"
+           > stored as textfile;
+OK
+Time taken: 0.16 seconds
+hive (nyse)> load data local inpath '/home/hduser/nyse/NYSE_dividends.tsv' into table NYSEdividends;
+OK
+Time taken: 0.266 seconds
+hive (nyse)> show tables;
+OK
+tab_name
+nysedaily
+nysedividends
+Time taken: 0.065 seconds, Fetched: 2 row(s)
+hive (nyse)> describe NYSEdividends;
+OK
+col_name	data_type	comment
+divexchange         	string              	                    
+divstock_symbol     	string              	                    
+divstock_date       	string              	                    
+dividends           	double              	                    
+Time taken: 0.193 seconds, Fetched: 4 row(s)
+hive (nyse)> describe formatted NYSEdividends;
+OK
+col_name	data_type	comment
+# col_name            	data_type           	comment             
+	 	 
+divexchange         	string              	                    
+divstock_symbol     	string              	                    
+divstock_date       	string              	                    
+dividends           	double              	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	nyse                	 
+Owner:              	hduser              	 
+CreateTime:         	Tue Nov 16 15:58:34 IST 2021	 
+LastAccessTime:     	UNKNOWN             	 
+Protect Mode:       	None                	 
+Retention:          	0                   	 
+Location:           	hdfs://localhost:54310/user/hive/warehouse/nyse.db/nysedividends	 
+Table Type:         	MANAGED_TABLE       	 
+Table Parameters:	 	 
+	COLUMN_STATS_ACCURATE	true                
+	numFiles            	1                   
+	totalSize           	57776               
+	transient_lastDdlTime	1637058597          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	 
+InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	field.delim         	\t                  
+	line.delim          	\n                  
+	serialization.format	\t                  
+Time taken: 0.151 seconds, Fetched: 34 row(s)
+hive (nyse)> select * from NYSEdividends limit 20;
+OK
+nysedividends.divexchange	nysedividends.divstock_symbol	nysedividends.divstock_date	nysedividends.dividends
+NYSE	JAH	12/30/2009	0.075
+NYSE	JAH	9/29/2009	0.075
+NYSE	JGT	12/11/2009	0.377
+NYSE	JGT	9/11/2009	0.377
+NYSE	JGT	6/11/2009	0.377
+NYSE	JGT	3/11/2009	0.377
+NYSE	JGT	12/11/2008	0.377
+NYSE	JGT	9/11/2008	0.451
+NYSE	JGT	6/11/2008	0.451
+NYSE	JGT	3/12/2008	0.451
+NYSE	JGT	12/12/2007	0.451
+NYSE	JGT	9/12/2007	0.451
+NYSE	JGT	6/13/2007	0.451
+NYSE	JKG	12/24/2009	0.327
+NYSE	JKG	9/23/2009	0.223
+NYSE	JKG	6/23/2009	0.177
+NYSE	JKG	3/25/2009	0.171
+NYSE	JKG	12/29/2008	0.077
+NYSE	JKG	12/24/2008	0.34
+NYSE	JKG	6/24/2008	0.199
+Time taken: 0.113 seconds, Fetched: 20 row(s)
+hive (nyse)> select * from NYSEdividends where dividends>=1;
+OK
+nysedividends.divexchange	nysedividends.divstock_symbol	nysedividends.divstock_date	nysedividends.dividends
+NYSE	JFC	12/5/2007	5.228
+NYSE	JFC	6/1/1994	1.45
+NYSE	JFC	12/10/1993	1.69
+NYSE	JFC	11/23/1993	1.69
+NYSE	JZJ	5/17/2006	1.016
+NYSE	JZJ	11/16/2005	1.016
+NYSE	JZJ	5/13/2005	1.016
+NYSE	JEQ	12/14/1993	1.091
+NYSE	JOE	10/10/2000	9.386
+NYSE	JOE	3/19/1997	3.33333
+NYSE	JEF	4/28/1999	10.07825
+NYSE	JHX	10/9/2002	1.25
+NYSE	JXI	6/22/2009	1.113
+NYSE	JXI	12/22/2008	1.408
+NYSE	JXI	6/23/2008	1.046
+Time taken: 0.211 seconds, Fetched: 15 row(s)
+hive (nyse)> select * from NYSEdividends where dividends>=1 limit 5;
+OK
+nysedividends.divexchange	nysedividends.divstock_symbol	nysedividends.divstock_date	nysedividends.dividends
+NYSE	JFC	12/5/2007	5.228
+NYSE	JFC	6/1/1994	1.45
+NYSE	JFC	12/10/1993	1.69
+NYSE	JFC	11/23/1993	1.69
+NYSE	JZJ	5/17/2006	1.016
+Time taken: 0.167 seconds, Fetched: 5 row(s)
+hive> select divstock_symbol, count(divstock_symbol) as divcount from nysedividends group by divstock_symbol;
+Query ID = hduser_20211117003351_29f30c00-3e70-47a4-92e5-48a9d808941f
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0009, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0009/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0009
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-17 00:33:58,766 Stage-1 map = 0%,  reduce = 0%
+2021-11-17 00:34:04,014 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.9 sec
+2021-11-17 00:34:09,166 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.74 sec
+MapReduce Total cumulative CPU time: 1 seconds 740 msec
+Ended Job = job_1637076986755_0009
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.74 sec   HDFS Read: 65537 HDFS Write: 475 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 740 msec
+OK
+divstock_symbol	divcount
+JAH	2
+JBI	13
+JBJ	13
+JBK	20
+JBL	15
+JBN	5
+JBO	11
+JBR	5
+JBT	5
+JCE	11
+JCI	97
+JCP	114
+JDD	50
+JEF	72
+JEQ	8
+JFC	19
+JFP	58
+JFR	68
+JGG	17
+JGT	11
+JGV	17
+JHI	99
+JHP	85
+JHS	88
+JHX	14
+JKD	10
+JKE	10
+JKF	17
+JKG	11
+JKH	10
+JKI	9
+JKJ	10
+JKK	6
+JKL	9
+JLA	31
+JLL	9
+JMP	10
+JNJ	160
+JNS	12
+JNY	26
+JOE	51
+JOF	12
+JPC	60
+JPG	24
+JPM	104
+JPS	89
+JPZ	39
+JQC	55
+JRN	22
+JRO	63
+JRT	1
+JSM	23
+JSN	36
+JTA	46
+JTD	10
+JTP	91
+JTX	18
+JWF	23
+JWN	81
+JXI	5
+JZC	11
+JZE	11
+JZH	12
+JZJ	12
+JZK	13
+JZL	11
+JZS	11
+JZT	12
+JZV	12
+Time taken: 19.594 seconds, Fetched: 69 row(s)
+hive> select divstock_symbol, count(divstock_symbol) as divcount from nysedividends group by divstock_symbol having divcount>=10;
+Query ID = hduser_20211117003701_ed91e502-7a72-4f77-88e8-a0cec5e59b83
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0011, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0011/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0011
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-17 00:37:07,905 Stage-1 map = 0%,  reduce = 0%
+2021-11-17 00:37:13,102 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.84 sec
+2021-11-17 00:37:20,320 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 2.04 sec
+MapReduce Total cumulative CPU time: 2 seconds 40 msec
+Ended Job = job_1637076986755_0011
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 2.04 sec   HDFS Read: 65951 HDFS Write: 409 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 40 msec
+OK
+divstock_symbol	divcount
+JBI	13
+JBJ	13
+JBK	20
+JBL	15
+JBO	11
+JCE	11
+JCI	97
+JCP	114
+JDD	50
+JEF	72
+JFC	19
+JFP	58
+JFR	68
+JGG	17
+JGT	11
+JGV	17
+JHI	99
+JHP	85
+JHS	88
+JHX	14
+JKD	10
+JKE	10
+JKF	17
+JKG	11
+JKH	10
+JKJ	10
+JLA	31
+JMP	10
+JNJ	160
+JNS	12
+JNY	26
+JOE	51
+JOF	12
+JPC	60
+JPG	24
+JPM	104
+JPS	89
+JPZ	39
+JQC	55
+JRN	22
+JRO	63
+JSM	23
+JSN	36
+JTA	46
+JTD	10
+JTP	91
+JTX	18
+JWF	23
+JWN	81
+JZC	11
+JZE	11
+JZH	12
+JZJ	12
+JZK	13
+JZL	11
+JZS	11
+JZT	12
+JZV	12
+Time taken: 20.05 seconds, Fetched: 58 row(s)
+hive> select divstock_symbol, count(divstock_symbol) as divcount from nysedividends where dividends>=0.5 group by divstock_symbol having divcount>=10;
+Query ID = hduser_20211117003952_d2f80e20-8878-4878-92fd-3f0feac1fdf4
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0013, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0013/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0013
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-17 00:39:58,603 Stage-1 map = 0%,  reduce = 0%
+2021-11-17 00:40:04,729 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 1.2 sec
+2021-11-17 00:40:09,862 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 2.21 sec
+MapReduce Total cumulative CPU time: 2 seconds 210 msec
+Ended Job = job_1637076986755_0013
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 2.21 sec   HDFS Read: 66478 HDFS Write: 98 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 210 msec
+OK
+divstock_symbol	divcount
+JBI	13
+JBJ	13
+JBO	10
+JCP	16
+JHI	18
+JZC	11
+JZE	11
+JZH	12
+JZJ	11
+JZK	12
+JZL	10
+JZS	11
+JZT	12
+JZV	12
+Time taken: 17.95 seconds, Fetched: 14 row(s)
+hive> select a.stock_symbol, a.stock_price_close from nysedaily a join nysedividends b on a.stock_symbol=b.divstock_symbol and a.stock_date=b.divstock_date limit 10;
+Query ID = hduser_20211117004255_5b3f988a-0209-4369-a842-430b14fdaea1
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211117004255_5b3f988a-0209-4369-a842-430b14fdaea1.log
+2021-11-17 00:42:58	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-17 00:42:59	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/a8371139-1691-480e-b99b-f63f41ef5742/hive_2021-11-17_00-42-55_759_6937925486827059315-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile21--.hashtable
+2021-11-17 00:42:59	Uploaded 1 File to: file:/tmp/hduser/a8371139-1691-480e-b99b-f63f41ef5742/hive_2021-11-17_00-42-55_759_6937925486827059315-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile21--.hashtable (69565 bytes)
+2021-11-17 00:42:59	End of local task; Time Taken: 1.236 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637076986755_0014, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0014/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0014
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-17 00:43:07,185 Stage-3 map = 0%,  reduce = 0%
+2021-11-17 00:43:12,313 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.19 sec
+MapReduce Total cumulative CPU time: 1 seconds 190 msec
+Ended Job = job_1637076986755_0014
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 1.19 sec   HDFS Read: 77448 HDFS Write: 99 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 190 msec
+OK
+a.stock_symbol	a.stock_price_close
+JEF	17.75
+JEF	18.86
+JEF	24.86
+JEF	24.79
+JEF	32.05
+JEF	28.35
+JEF	29.44
+JEF	24.82
+JEF	29.6
+JEF	52.75
+Time taken: 18.676 seconds, Fetched: 10 row(s)
+hive> select a.stock_symbol,a.stock_price_close,b.dividends,b.divstock_date from nysedaily a join nysedividends b on a.stock_symbol=b.divstock_symbol and a.stock_date=b.divstock_date where a.stock_price_close>=20;
+Query ID = hduser_20211117004341_2155ff4f-2157-4407-8d5a-d5b74f438d0b
+Total jobs = 1
+Execution log at: /tmp/hduser/hduser_20211117004341_2155ff4f-2157-4407-8d5a-d5b74f438d0b.log
+2021-11-17 00:43:44	Starting to launch local task to process map join;	maximum memory = 518979584
+2021-11-17 00:43:45	Dump the side-table for tag: 1 with group count: 2215 into file: file:/tmp/hduser/a8371139-1691-480e-b99b-f63f41ef5742/hive_2021-11-17_00-43-41_411_254360400594950155-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile31--.hashtable
+2021-11-17 00:43:45	Uploaded 1 File to: file:/tmp/hduser/a8371139-1691-480e-b99b-f63f41ef5742/hive_2021-11-17_00-43-41_411_254360400594950155-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile31--.hashtable (89595 bytes)
+2021-11-17 00:43:45	End of local task; Time Taken: 1.734 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637076986755_0015, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0015/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0015
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2021-11-17 00:43:53,505 Stage-3 map = 0%,  reduce = 0%
+2021-11-17 00:43:59,641 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 1.63 sec
+MapReduce Total cumulative CPU time: 1 seconds 630 msec
+Ended Job = job_1637076986755_0015
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 1.63 sec   HDFS Read: 9285325 HDFS Write: 26307 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 630 msec
+OK
+a.stock_symbol	a.stock_price_close	b.dividends	b.divstock_date
+JEF	24.86	0.125	11/13/2007
+JEF	24.79	0.125	8/13/2007
+JEF	32.05	0.125	5/11/2007
+JEF	28.35	0.125	2/13/2007
+JEF	29.44	0.125	11/13/2006
+JEF	24.82	0.125	8/11/2006
+JEF	29.6	0.063	5/23/2006
+....
+JTX	20.32	0.07	3/24/2005
+JTX	24.75	0.07	12/22/2004
+JTX	21.13	0.07	9/23/2004
+Time taken: 19.297 seconds, Fetched: 1012 row(s)
+hive> drop table nysedividends;
+OK
+Time taken: 0.055 seconds
+hive> create external table NYSEdividends (divexchange String,divstock_symbol String,divstock_date String,dividends double)
+    > row format delimited fields terminated by "\t" lines terminated by "\n" location '/user/hduser/nysediv_ext';
+OK
+Time taken: 0.31 seconds
+hive>
+hive> show tables;
+OK
+nysedaily
+nysedividends
+Time taken: 0.05 seconds, Fetched: 2 row(s)
+hive> describe NYSEdividends;
+OK
+divexchange         	string              	                    
+divstock_symbol     	string              	                    
+divstock_date       	string              	                    
+dividends           	double              	                    
+Time taken: 0.282 seconds, Fetched: 4 row(s)
+hive> describe NYSEdividends;
+OK
+# col_name            	data_type           	comment             
+	 	 
+divexchange         	string              	                    
+divstock_symbol     	string              	                    
+divstock_date       	string              	                    
+dividends           	double              	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	nyse                	 
+Owner:              	hduser              	 
+CreateTime:         	Tue Nov 16 17:10:31 IST 2021	 
+LastAccessTime:     	UNKNOWN             	 
+Protect Mode:       	None                	 
+Retention:          	0                   	 
+Location:           	hdfs://localhost:54310/user/hduser/nysediv_ext	 
+Table Type:         	EXTERNAL_TABLE      	 
+Table Parameters:	 	 
+	EXTERNAL            	TRUE                
+	transient_lastDdlTime	1637062831          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	 
+InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	field.delim         	\t                  
+	line.delim          	\n                  
+	serialization.format	\t                  
+Time taken: 0.22 seconds, Fetched: 32 row(s)hive> load data inpath 
+    > '/user/hduser/nyse/NYSE_dividends.tsv' into table NYSEdividends;
+Loading data to table nyse.nysedividends
+Table nyse.nysedividends stats: [numFiles=0, totalSize=0]
+OK
+Time taken: 0.707 seconds
+hive> show tables;
+OK
+nysedaily
+nysedividends
+Time taken: 0.091 seconds, Fetched: 2 row(s)
+hive> select * from nysedividends;
+OK
+NYSE	JAH	12/30/2009	0.075
+NYSE	JAH	9/29/2009	0.075
+NYSE	JGT	12/11/2009	0.377
+NYSE	JGT	9/11/2009	0.377
+NYSE	JGT	6/11/2009	0.377
+NYSE	JGT	3/11/2009	0.377
+NYSE	JGT	12/11/2008	0.377
+NYSE	JGT	9/11/2008	0.451
+NYSE	JGT	6/11/2008	0.451
+NYSE	JGT	3/12/2008	0.451
+NYSE	JGT	12/12/2007	0.451
+..........
+Time taken: 1.015 seconds, Fetched: 2215 row(s)
+hive> create external table NYSEdaily_part (stexchange String,stock_symbol String,stock_date String,stock_price_open double, stock_price_high double, stock_price_low double,stock_price_close double, stock_volume double, stock_price_adj_close double)PARTITIONED BY (Year String) row format delimited fields terminated by "\t" lines terminated by "\n" location '/user/hduser/nysedaily_part';
+OK
+Time taken: 0.132 seconds
+hive> show tables;
+OK
+nysedaily
+nysedaily_part
+nysedividends
+Time taken: 0.064 seconds, Fetched: 3 row(s)
+hive> set hive.exec.dynamic.partition.mode=nonstrict;
+hive> INSERT OVERWRITE TABLE NYSEdaily_part PARTITION (year) select *, substr(stock_date, length(stock_date)-3) as year from nysedaily;
+Query ID = hduser_20211116202649_626c581c-b706-4796-a9f6-bebdcb8d6991
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637071944535_0002, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637071944535_0002/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637071944535_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2021-11-16 20:26:57,960 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 20:27:09,452 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.92 sec
+MapReduce Total cumulative CPU time: 3 seconds 920 msec
+Ended Job = job_1637071944535_0002
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hduser/nysedaily_part/.hive-staging_hive_2021-11-16_20-26-49_420_7090511948073911574-1/-ext-10000
+Loading data to table nyse.nysedaily_part partition (year=null)
+	 Time taken for load dynamic partitions : 3187
+	Loading partition {year=1973}
+	Loading partition {year=1988}
+	Loading partition {year=1979}
+	Loading partition {year=2005}
+	Loading partition {year=2010}
+	Loading partition {year=1999}
+	Loading partition {year=2002}
+	Loading partition {year=1982}
+	Loading partition {year=1985}
+	Loading partition {year=1976}
+	Loading partition {year=1991}
+	Loading partition {year=1971}
+	Loading partition {year=1994}
+	Loading partition {year=1977}
+	Loading partition {year=1980}
+	Loading partition {year=2008}
+	Loading partition {year=1983}
+	Loading partition {year=1997}
+	Loading partition {year=2000}
+	Loading partition {year=1974}
+	Loading partition {year=1992}
+	Loading partition {year=1995}
+	Loading partition {year=1998}
+	Loading partition {year=2003}
+	Loading partition {year=2006}
+	Loading partition {year=1972}
+	Loading partition {year=1986}
+	Loading partition {year=1989}
+	Loading partition {year=2009}
+	Loading partition {year=1987}
+	Loading partition {year=1981}
+	Loading partition {year=2001}
+	Loading partition {year=2004}
+	Loading partition {year=1984}
+	Loading partition {year=1990}
+	Loading partition {year=1975}
+	Loading partition {year=1996}
+	Loading partition {year=1970}
+	Loading partition {year=2007}
+	Loading partition {year=1993}
+	Loading partition {year=1978}
+	 Time taken for adding to write entity : 29
+Partition nyse.nysedaily_part{year=1970} stats: [numFiles=1, numRows=254, totalSize=14469, rawDataSize=14215]
+Partition nyse.nysedaily_part{year=1971} stats: [numFiles=1, numRows=253, totalSize=13996, rawDataSize=13743]
+Partition nyse.nysedaily_part{year=1972} stats: [numFiles=1, numRows=251, totalSize=14852, rawDataSize=14601]
+Partition nyse.nysedaily_part{year=1973} stats: [numFiles=1, numRows=252, totalSize=15084, rawDataSize=14832]
+Partition nyse.nysedaily_part{year=1974} stats: [numFiles=1, numRows=253, totalSize=14689, rawDataSize=14436]
+Partition nyse.nysedaily_part{year=1975} stats: [numFiles=1, numRows=253, totalSize=14158, rawDataSize=13905]
+Partition nyse.nysedaily_part{year=1976} stats: [numFiles=1, numRows=253, totalSize=14247, rawDataSize=13994]
+Partition nyse.nysedaily_part{year=1977} stats: [numFiles=1, numRows=252, totalSize=14279, rawDataSize=14027]
+Partition nyse.nysedaily_part{year=1978} stats: [numFiles=1, numRows=252, totalSize=14260, rawDataSize=14008]
+Partition nyse.nysedaily_part{year=1979} stats: [numFiles=1, numRows=253, totalSize=14300, rawDataSize=14047]
+Partition nyse.nysedaily_part{year=1980} stats: [numFiles=1, numRows=253, totalSize=14309, rawDataSize=14056]
+Partition nyse.nysedaily_part{year=1981} stats: [numFiles=1, numRows=253, totalSize=14591, rawDataSize=14338]
+Partition nyse.nysedaily_part{year=1982} stats: [numFiles=1, numRows=506, totalSize=28677, rawDataSize=28171]
+Partition nyse.nysedaily_part{year=1983} stats: [numFiles=1, numRows=507, totalSize=28725, rawDataSize=28218]
+Partition nyse.nysedaily_part{year=1984} stats: [numFiles=1, numRows=759, totalSize=42721, rawDataSize=41962]
+Partition nyse.nysedaily_part{year=1985} stats: [numFiles=1, numRows=1076, totalSize=60095, rawDataSize=59019]
+Partition nyse.nysedaily_part{year=1986} stats: [numFiles=1, numRows=1388, totalSize=76807, rawDataSize=75419]
+Partition nyse.nysedaily_part{year=1987} stats: [numFiles=1, numRows=1518, totalSize=84091, rawDataSize=82573]
+Partition nyse.nysedaily_part{year=1988} stats: [numFiles=1, numRows=1769, totalSize=96645, rawDataSize=94876]
+Partition nyse.nysedaily_part{year=1989} stats: [numFiles=1, numRows=1764, totalSize=96353, rawDataSize=94589]
+Partition nyse.nysedaily_part{year=1990} stats: [numFiles=1, numRows=2414, totalSize=131633, rawDataSize=129219]
+Partition nyse.nysedaily_part{year=1991} stats: [numFiles=1, numRows=2689, totalSize=147769, rawDataSize=145080]
+Partition nyse.nysedaily_part{year=1992} stats: [numFiles=1, numRows=3216, totalSize=176519, rawDataSize=173303]
+Partition nyse.nysedaily_part{year=1993} stats: [numFiles=1, numRows=3905, totalSize=214885, rawDataSize=210980]
+Partition nyse.nysedaily_part{year=1994} stats: [numFiles=1, numRows=4027, totalSize=221795, rawDataSize=217768]
+Partition nyse.nysedaily_part{year=1995} stats: [numFiles=1, numRows=4029, totalSize=222160, rawDataSize=218131]
+Partition nyse.nysedaily_part{year=1996} stats: [numFiles=1, numRows=4064, totalSize=225341, rawDataSize=221277]
+Partition nyse.nysedaily_part{year=1997} stats: [numFiles=1, numRows=4163, totalSize=232508, rawDataSize=228345]
+Partition nyse.nysedaily_part{year=1998} stats: [numFiles=1, numRows=4281, totalSize=238363, rawDataSize=234082]
+Partition nyse.nysedaily_part{year=1999} stats: [numFiles=1, numRows=4415, totalSize=247416, rawDataSize=243001]
+Partition nyse.nysedaily_part{year=2000} stats: [numFiles=1, numRows=4602, totalSize=258090, rawDataSize=253488]
+Partition nyse.nysedaily_part{year=2001} stats: [numFiles=1, numRows=4760, totalSize=263807, rawDataSize=259047]
+Partition nyse.nysedaily_part{year=2002} stats: [numFiles=1, numRows=5229, totalSize=289569, rawDataSize=284340]
+Partition nyse.nysedaily_part{year=2003} stats: [numFiles=1, numRows=6818, totalSize=380604, rawDataSize=373786]
+Partition nyse.nysedaily_part{year=2004} stats: [numFiles=1, numRows=12127, totalSize=675245, rawDataSize=663118]
+Partition nyse.nysedaily_part{year=2005} stats: [numFiles=1, numRows=15093, totalSize=840547, rawDataSize=825454]
+Partition nyse.nysedaily_part{year=2006} stats: [numFiles=1, numRows=15998, totalSize=893064, rawDataSize=877066]
+Partition nyse.nysedaily_part{year=2007} stats: [numFiles=1, numRows=17852, totalSize=1000142, rawDataSize=982290]
+Partition nyse.nysedaily_part{year=2008} stats: [numFiles=1, numRows=18845, totalSize=1044471, rawDataSize=1025626]
+Partition nyse.nysedaily_part{year=2009} stats: [numFiles=1, numRows=18709, totalSize=1029382, rawDataSize=1010673]
+Partition nyse.nysedaily_part{year=2010} stats: [numFiles=1, numRows=1875, totalSize=103683, rawDataSize=101808]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 3.92 sec   HDFS Read: 9283261 HDFS Write: 9526565 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 920 msec
+OK
+Time taken: 27.583 seconds
+hive> select *, substr(stock_date,length(stock_date)-3) as year from nysedaily limit 10;
+OK
+NYSE	JEF	2/8/2010	25.4	25.49	24.78	24.82	1134300.0	24.82	2010
+NYSE	JEF	2/5/2010	24.91	25.19	24.08	25.01	1765200.0	25.01	2010
+NYSE	JEF	2/4/2010	26.01	26.2	24.85	24.85	1414400.0	24.85	2010
+NYSE	JEF	2/3/2010	26.23	26.76	26.22	26.29	1066000.0	26.29	2010
+NYSE	JEF	2/2/2010	26.08	26.86	25.78	26.46	1496400.0	26.46	2010
+NYSE	JEF	2/1/2010	25.61	26.11	25.36	26.11	2381800.0	26.11	2010
+NYSE	JEF	1/29/2010	26.57	26.8	25.41	25.54	2010000.0	25.54	2010
+NYSE	JEF	1/28/2010	27.4	27.4	26.35	26.36	1708100.0	26.36	2010
+NYSE	JEF	1/27/2010	26.44	27.15	26.42	27.14	1929700.0	27.14	2010
+NYSE	JEF	1/26/2010	26.68	26.99	26.46	26.5	1422100.0	26.5	2010
+Time taken: 0.096 seconds, Fetched: 10 row(s)
+hive> create external table NYSEdaily_bucket (stexchange String,stock_symbol String,stock_date String,stock_price_open double, stock_price_high double, stock_price_low double, stock_price_close double, stock_volume double, stock_price_adj_close double) PARTITIONED BY (Year String) CLUSTERED BY (stock_symbol) INTO 50 BUCKETS row format delimited fields terminated by "\t" lines terminated by "\n" location '/user/hduser/nysedaily_bucket'
+    > ;
+OK
+Time taken: 0.1 seconds
+hive> show tables;
+OK
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedividends
+Time taken: 0.26 seconds, Fetched: 4 row(s)
+hive> INSERT INTO TABLE NYSEdaily_bucket PARTITION (year) select *, substr(stock_date,length(stock_date)-3) as year from nysedaily;
+FAILED: SemanticException [Error 10096]: Dynamic partition strict mode requires at least one static partition column. To turn this off set hive.exec.dynamic.partition.mode=nonstrict
+hive> set hive.exec.dynamic.partition.mode=nonstrict;
+hive> INSERT INTO TABLE NYSEdaily_bucket PARTITION (year) select *, substr(stock_date,length(stock_date)-3) as year from nysedaily;
+Query ID = hduser_20211116203851_25a1d199-c0f3-436d-b7ff-d9e50018b1e5
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1637071944535_0004, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637071944535_0004/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637071944535_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2021-11-16 20:39:00,015 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 20:39:09,646 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.2 sec
+MapReduce Total cumulative CPU time: 3 seconds 200 msec
+Ended Job = job_1637071944535_0004
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hduser/nysedaily_bucket/.hive-staging_hive_2021-11-16_20-38-51_259_3742233131905033127-1/-ext-10000
+Loading data to table nyse.nysedaily_bucket partition (year=null)
+	 Time taken for load dynamic partitions : 7156
+	Loading partition {year=1981}
+	Loading partition {year=1987}
+	Loading partition {year=2004}
+	Loading partition {year=1984}
+	Loading partition {year=1972}
+	Loading partition {year=1975}
+	Loading partition {year=2010}
+	Loading partition {year=1990}
+	Loading partition {year=1998}
+	Loading partition {year=2001}
+	Loading partition {year=1973}
+	Loading partition {year=1976}
+	Loading partition {year=1982}
+	Loading partition {year=1999}
+	Loading partition {year=1996}
+	Loading partition {year=1993}
+	Loading partition {year=1978}
+	Loading partition {year=2007}
+	Loading partition {year=1970}
+	Loading partition {year=1971}
+	Loading partition {year=1991}
+	Loading partition {year=1997}
+	Loading partition {year=2002}
+	Loading partition {year=1988}
+	Loading partition {year=2005}
+	Loading partition {year=2008}
+	Loading partition {year=1989}
+	Loading partition {year=1994}
+	Loading partition {year=1985}
+	Loading partition {year=1979}
+	Loading partition {year=2009}
+	Loading partition {year=2006}
+	Loading partition {year=1992}
+	Loading partition {year=1986}
+	Loading partition {year=1980}
+	Loading partition {year=1995}
+	Loading partition {year=2000}
+	Loading partition {year=1977}
+	Loading partition {year=1974}
+	Loading partition {year=2003}
+	Loading partition {year=1983}
+	 Time taken for adding to write entity : 35
+Partition nyse.nysedaily_bucket{year=1970} stats: [numFiles=2, numRows=508, totalSize=28938, rawDataSize=28430]
+Partition nyse.nysedaily_bucket{year=1971} stats: [numFiles=2, numRows=506, totalSize=27992, rawDataSize=27486]
+Partition nyse.nysedaily_bucket{year=1972} stats: [numFiles=2, numRows=502, totalSize=29704, rawDataSize=29202]
+Partition nyse.nysedaily_bucket{year=1973} stats: [numFiles=2, numRows=504, totalSize=30168, rawDataSize=29664]
+Partition nyse.nysedaily_bucket{year=1974} stats: [numFiles=2, numRows=506, totalSize=29378, rawDataSize=28872]
+Partition nyse.nysedaily_bucket{year=1975} stats: [numFiles=2, numRows=506, totalSize=28316, rawDataSize=27810]
+Partition nyse.nysedaily_bucket{year=1976} stats: [numFiles=2, numRows=506, totalSize=28494, rawDataSize=27988]
+Partition nyse.nysedaily_bucket{year=1977} stats: [numFiles=2, numRows=504, totalSize=28558, rawDataSize=28054]
+Partition nyse.nysedaily_bucket{year=1978} stats: [numFiles=2, numRows=504, totalSize=28520, rawDataSize=28016]
+Partition nyse.nysedaily_bucket{year=1979} stats: [numFiles=2, numRows=506, totalSize=28600, rawDataSize=28094]
+Partition nyse.nysedaily_bucket{year=1980} stats: [numFiles=2, numRows=506, totalSize=28618, rawDataSize=28112]
+Partition nyse.nysedaily_bucket{year=1981} stats: [numFiles=2, numRows=506, totalSize=29182, rawDataSize=28676]
+Partition nyse.nysedaily_bucket{year=1982} stats: [numFiles=2, numRows=1012, totalSize=57354, rawDataSize=56342]
+Partition nyse.nysedaily_bucket{year=1983} stats: [numFiles=2, numRows=1014, totalSize=57450, rawDataSize=56436]
+Partition nyse.nysedaily_bucket{year=1984} stats: [numFiles=2, numRows=1518, totalSize=85442, rawDataSize=83924]
+Partition nyse.nysedaily_bucket{year=1985} stats: [numFiles=2, numRows=2152, totalSize=120190, rawDataSize=118038]
+Partition nyse.nysedaily_bucket{year=1986} stats: [numFiles=2, numRows=2776, totalSize=153614, rawDataSize=150838]
+Partition nyse.nysedaily_bucket{year=1987} stats: [numFiles=2, numRows=3036, totalSize=168182, rawDataSize=165146]
+Partition nyse.nysedaily_bucket{year=1988} stats: [numFiles=2, numRows=3538, totalSize=193290, rawDataSize=189752]
+Partition nyse.nysedaily_bucket{year=1989} stats: [numFiles=2, numRows=3528, totalSize=192706, rawDataSize=189178]
+Partition nyse.nysedaily_bucket{year=1990} stats: [numFiles=2, numRows=4828, totalSize=263266, rawDataSize=258438]
+Partition nyse.nysedaily_bucket{year=1991} stats: [numFiles=2, numRows=5378, totalSize=295538, rawDataSize=290160]
+Partition nyse.nysedaily_bucket{year=1992} stats: [numFiles=2, numRows=6432, totalSize=353038, rawDataSize=346606]
+Partition nyse.nysedaily_bucket{year=1993} stats: [numFiles=2, numRows=7810, totalSize=429770, rawDataSize=421960]
+Partition nyse.nysedaily_bucket{year=1994} stats: [numFiles=2, numRows=8054, totalSize=443590, rawDataSize=435536]
+Partition nyse.nysedaily_bucket{year=1995} stats: [numFiles=2, numRows=8058, totalSize=444320, rawDataSize=436262]
+Partition nyse.nysedaily_bucket{year=1996} stats: [numFiles=2, numRows=8128, totalSize=450682, rawDataSize=442554]
+Partition nyse.nysedaily_bucket{year=1997} stats: [numFiles=2, numRows=8326, totalSize=465016, rawDataSize=456690]
+Partition nyse.nysedaily_bucket{year=1998} stats: [numFiles=2, numRows=8562, totalSize=476726, rawDataSize=468164]
+Partition nyse.nysedaily_bucket{year=1999} stats: [numFiles=2, numRows=8830, totalSize=494832, rawDataSize=486002]
+Partition nyse.nysedaily_bucket{year=2000} stats: [numFiles=2, numRows=9204, totalSize=516180, rawDataSize=506976]
+Partition nyse.nysedaily_bucket{year=2001} stats: [numFiles=2, numRows=9520, totalSize=527614, rawDataSize=518094]
+Partition nyse.nysedaily_bucket{year=2002} stats: [numFiles=2, numRows=10458, totalSize=579138, rawDataSize=568680]
+Partition nyse.nysedaily_bucket{year=2003} stats: [numFiles=2, numRows=13636, totalSize=761208, rawDataSize=747572]
+Partition nyse.nysedaily_bucket{year=2004} stats: [numFiles=2, numRows=24254, totalSize=1350490, rawDataSize=1326236]
+Partition nyse.nysedaily_bucket{year=2005} stats: [numFiles=2, numRows=30186, totalSize=1681094, rawDataSize=1650908]
+Partition nyse.nysedaily_bucket{year=2006} stats: [numFiles=2, numRows=31996, totalSize=1786128, rawDataSize=1754132]
+Partition nyse.nysedaily_bucket{year=2007} stats: [numFiles=2, numRows=35704, totalSize=2000284, rawDataSize=1964580]
+Partition nyse.nysedaily_bucket{year=2008} stats: [numFiles=2, numRows=37690, totalSize=2088942, rawDataSize=2051252]
+Partition nyse.nysedaily_bucket{year=2009} stats: [numFiles=2, numRows=37418, totalSize=2058764, rawDataSize=2021346]
+Partition nyse.nysedaily_bucket{year=2010} stats: [numFiles=2, numRows=3750, totalSize=207366, rawDataSize=203616]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 3.2 sec   HDFS Read: 9283311 HDFS Write: 9526647 SUCCESS
+Total MapReduce CPU Time Spent: 3 seconds 200 msec
+OK
+Time taken: 30.874 seconds
+hive> show partitions nysedaily_bucket
+    > ;
+OK
+year=1970
+year=1971
+year=1972
+year=1973
+year=1974
+year=1975
+year=1976
+year=1977
+year=1978
+year=1979
+year=1980
+year=1981
+year=1982
+year=1983
+year=1984
+year=1985
+year=1986
+year=1987
+year=1988
+year=1989
+year=1990
+year=1991
+year=1992
+year=1993
+year=1994
+year=1995
+year=1996
+year=1997
+year=1998
+year=1999
+year=2000
+year=2001
+year=2002
+year=2003
+year=2004
+year=2005
+year=2006
+year=2007
+year=2008
+year=2009
+year=2010
+Time taken: 0.498 seconds, Fetched: 41 row(s)
+hive> show tables;
+OK
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedividends
+Time taken: 0.052 seconds, Fetched: 4 row(s)
+hive> create table stugrades (stuname string, stuid int, stuexam string, stumarks array<int>) row format delimited fields terminated by '\t' collection items terminated by '|' lines terminated by '\n';
+OK
+Time taken: 0.435 seconds
+hive> load data local inpath '/home/hduser/Downloads/sharedfolder/latviewtestdata.txt' into table stugrades;
+Loading data to table nyse.stugrades
+Table nyse.stugrades stats: [numFiles=1, totalSize=284]
+OK
+Time taken: 1.056 seconds
+hive> set hive.exec.dynamic.partition.mode=nonstrict;
+hive> select explode(stumarks) from stugrades;
+OK
+95
+90
+85
+75
+80
+70
+65
+60
+55
+50
+50
+45
+40
+35
+38
+90
+95
+80
+70
+85
+75
+60
+65
+50
+55
+55
+40
+45
+30
+33
+100
+95
+90
+80
+85
+75
+70
+65
+60
+55
+55
+50
+50
+45
+48
+Time taken: 0.291 seconds, Fetched: 45 row(s)
+hive> set hive.cli.print.header=true;
+hive> select stuid,stuname,indvmarks from stugrades
+    > lateral view explode(stumarks) markstbl as indvmarks;
+OK
+stuid	stuname	indvmarks
+101	Rahul	95
+101	Rahul	90
+101	Rahul	85
+101	Rahul	75
+101	Rahul	80
+102	Ravi	70
+102	Ravi	65
+102	Ravi	60
+102	Ravi	55
+102	Ravi	50
+103	Vinod	50
+103	Vinod	45
+103	Vinod	40
+103	Vinod	35
+103	Vinod	38
+101	Rahul	90
+101	Rahul	95
+101	Rahul	80
+101	Rahul	70
+101	Rahul	85
+102	Ravi	75
+102	Ravi	60
+102	Ravi	65
+102	Ravi	50
+102	Ravi	55
+103	Vinod	55
+103	Vinod	40
+103	Vinod	45
+103	Vinod	30
+103	Vinod	33
+101	Rahul	100
+101	Rahul	95
+101	Rahul	90
+101	Rahul	80
+101	Rahul	85
+102	Ravi	75
+102	Ravi	70
+102	Ravi	65
+102	Ravi	60
+102	Ravi	55
+103	Vinod	55
+103	Vinod	50
+103	Vinod	50
+103	Vinod	45
+103	Vinod	48
+Time taken: 0.098 seconds, Fetched: 45 row(s)
+hive> select stuid,stuname,stuexam,markstbl.indvmarks from stugrades lateral view explode(stumarks) markstbl as indvmarks order by stuexam,stuname;
+Query ID = hduser_20211116211350_7f77e1f1-087d-42eb-b373-2187462c8fc8
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0001, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0001/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:14:00,329 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:14:05,819 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.96 sec
+2021-11-16 21:14:11,107 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.83 sec
+MapReduce Total cumulative CPU time: 1 seconds 830 msec
+Ended Job = job_1637076986755_0001
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.83 sec   HDFS Read: 9647 HDFS Write: 841 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 830 msec
+OK
+stuid	stuname	stuexam	markstbl.indvmarks
+101	Rahul	sem-1	90
+101	Rahul	sem-1	85
+101	Rahul	sem-1	95
+101	Rahul	sem-1	75
+101	Rahul	sem-1	80
+102	Ravi	sem-1	70
+102	Ravi	sem-1	65
+102	Ravi	sem-1	60
+102	Ravi	sem-1	55
+102	Ravi	sem-1	50
+103	Vinod	sem-1	50
+103	Vinod	sem-1	45
+103	Vinod	sem-1	40
+103	Vinod	sem-1	35
+103	Vinod	sem-1	38
+101	Rahul	sem-2	90
+101	Rahul	sem-2	95
+101	Rahul	sem-2	80
+101	Rahul	sem-2	70
+101	Rahul	sem-2	85
+102	Ravi	sem-2	65
+102	Ravi	sem-2	55
+102	Ravi	sem-2	50
+102	Ravi	sem-2	60
+102	Ravi	sem-2	75
+103	Vinod	sem-2	55
+103	Vinod	sem-2	40
+103	Vinod	sem-2	45
+103	Vinod	sem-2	30
+103	Vinod	sem-2	33
+101	Rahul	sem-3	100
+101	Rahul	sem-3	95
+101	Rahul	sem-3	90
+101	Rahul	sem-3	80
+101	Rahul	sem-3	85
+102	Ravi	sem-3	75
+102	Ravi	sem-3	70
+102	Ravi	sem-3	65
+102	Ravi	sem-3	60
+102	Ravi	sem-3	55
+103	Vinod	sem-3	55
+103	Vinod	sem-3	50
+103	Vinod	sem-3	50
+103	Vinod	sem-3	45
+103	Vinod	sem-3	48
+Time taken: 22.831 seconds, Fetched: 45 row(s)
+hive> select stuid,stuname,stuexam,markstbl.indvmarks from stugrades lateral view explode(stumarks) markstbl as indvmarks order by stuexam,stuname;
+Query ID = hduser_20211116211619_51648c7e-a6de-4ac7-aacd-cbfde09c2f10
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0002, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0002/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:16:25,879 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:16:32,075 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 1.02 sec
+2021-11-16 21:16:37,264 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.94 sec
+MapReduce Total cumulative CPU time: 1 seconds 940 msec
+Ended Job = job_1637076986755_0002
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.94 sec   HDFS Read: 9832 HDFS Write: 841 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 940 msec
+OK
+stuid	stuname	stuexam	markstbl.indvmarks
+101	Rahul	sem-1	90
+101	Rahul	sem-1	85
+101	Rahul	sem-1	95
+101	Rahul	sem-1	75
+101	Rahul	sem-1	80
+102	Ravi	sem-1	70
+102	Ravi	sem-1	65
+102	Ravi	sem-1	60
+102	Ravi	sem-1	55
+102	Ravi	sem-1	50
+103	Vinod	sem-1	50
+103	Vinod	sem-1	45
+103	Vinod	sem-1	40
+103	Vinod	sem-1	35
+103	Vinod	sem-1	38
+101	Rahul	sem-2	90
+101	Rahul	sem-2	95
+101	Rahul	sem-2	80
+101	Rahul	sem-2	70
+101	Rahul	sem-2	85
+102	Ravi	sem-2	65
+102	Ravi	sem-2	55
+102	Ravi	sem-2	50
+102	Ravi	sem-2	60
+102	Ravi	sem-2	75
+103	Vinod	sem-2	55
+103	Vinod	sem-2	40
+103	Vinod	sem-2	45
+103	Vinod	sem-2	30
+103	Vinod	sem-2	33
+101	Rahul	sem-3	100
+101	Rahul	sem-3	95
+101	Rahul	sem-3	90
+101	Rahul	sem-3	80
+101	Rahul	sem-3	85
+102	Ravi	sem-3	75
+102	Ravi	sem-3	70
+102	Ravi	sem-3	65
+102	Ravi	sem-3	60
+102	Ravi	sem-3	55
+103	Vinod	sem-3	55
+103	Vinod	sem-3	50
+103	Vinod	sem-3	50
+103	Vinod	sem-3	45
+103	Vinod	sem-3	48
+Time taken: 19.136 seconds, Fetched: 45 row(s)
+hive> select stuname, stuexam, max(markstbl.indvmarks) from stugrades
+    > LATERAL VIEW explode(stumarks) markstbl AS indvmarks group by stuname, stuexam;
+Query ID = hduser_20211116211842_6bc9243e-13d2-4c80-9654-ffbed1bcf789
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0003, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0003/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0003
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:18:49,380 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:18:54,581 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.81 sec
+2021-11-16 21:19:00,792 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.77 sec
+MapReduce Total cumulative CPU time: 1 seconds 770 msec
+Ended Job = job_1637076986755_0003
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.77 sec   HDFS Read: 10355 HDFS Write: 133 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 770 msec
+OK
+stuname	stuexam	_c2
+Rahul	sem-1	95
+Rahul	sem-2	95
+Rahul	sem-3	100
+Ravi	sem-1	70
+Ravi	sem-2	75
+Ravi	sem-3	75
+Vinod	sem-1	50
+Vinod	sem-2	55
+Vinod	sem-3	55
+Time taken: 19.742 seconds, Fetched: 9 row(s)
+hive> select stuname, stuexam, min(markstbl.indvmarks) from stugrades
+    > LATERAL VIEW explode(stumarks) markstbl AS indvmarks group by stuname, stuexam;
+Query ID = hduser_20211116211917_48f45755-ac19-46dd-8634-6def6a846b7c
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0004, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0004/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:19:23,832 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:19:28,968 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.89 sec
+2021-11-16 21:19:35,147 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.74 sec
+MapReduce Total cumulative CPU time: 1 seconds 740 msec
+Ended Job = job_1637076986755_0004
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.74 sec   HDFS Read: 10355 HDFS Write: 132 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 740 msec
+OK
+stuname	stuexam	_c2
+Rahul	sem-1	75
+Rahul	sem-2	70
+Rahul	sem-3	80
+Ravi	sem-1	50
+Ravi	sem-2	50
+Ravi	sem-3	55
+Vinod	sem-1	35
+Vinod	sem-2	30
+Vinod	sem-3	45
+Time taken: 18.44 seconds, Fetched: 9 row(s)
+hive> select stuname, stuexam, sum(markstbl.indvmarks) from stugrades
+    > LATERAL VIEW explode(stumarks) markstbl AS indvmarks group by stuname, stuexam;
+Query ID = hduser_20211116211951_b71ec35f-b217-4162-8f11-5d212b9c1649
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0005, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0005/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0005
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:19:56,541 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:20:01,653 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.87 sec
+2021-11-16 21:20:07,808 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.72 sec
+MapReduce Total cumulative CPU time: 1 seconds 720 msec
+Ended Job = job_1637076986755_0005
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.72 sec   HDFS Read: 10355 HDFS Write: 141 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 720 msec
+OK
+stuname	stuexam	_c2
+Rahul	sem-1	425
+Rahul	sem-2	420
+Rahul	sem-3	450
+Ravi	sem-1	300
+Ravi	sem-2	305
+Ravi	sem-3	325
+Vinod	sem-1	208
+Vinod	sem-2	203
+Vinod	sem-3	248
+Time taken: 17.843 seconds, Fetched: 9 row(s)
+hive> select stuname, stuexam, avg(markstbl.indvmarks) from stugrades
+    > LATERAL VIEW explode(stumarks) markstbl AS indvmarks group by stuname, stuexam;
+Query ID = hduser_20211116212019_165ea94f-c719-4861-b841-c66e713b2d5f
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1637076986755_0006, Tracking URL = http://hduser-VirtualBox:8088/proxy/application_1637076986755_0006/
+Kill Command = /usr/local/hadoop-2.9.1/bin/hadoop job  -kill job_1637076986755_0006
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2021-11-16 21:20:25,066 Stage-1 map = 0%,  reduce = 0%
+2021-11-16 21:20:30,203 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 0.9 sec
+2021-11-16 21:20:36,353 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 1.8 sec
+MapReduce Total cumulative CPU time: 1 seconds 800 msec
+Ended Job = job_1637076986755_0006
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 1.8 sec   HDFS Read: 10705 HDFS Write: 150 SUCCESS
+Total MapReduce CPU Time Spent: 1 seconds 800 msec
+OK
+stuname	stuexam	_c2
+Rahul	sem-1	85.0
+Rahul	sem-2	84.0
+Rahul	sem-3	90.0
+Ravi	sem-1	60.0
+Ravi	sem-2	61.0
+Ravi	sem-3	65.0
+Vinod	sem-1	41.6
+Vinod	sem-2	40.6
+Vinod	sem-3	49.6
+Time taken: 18.412 seconds, Fetched: 9 row(s)
+hive> CREATE EXTERNAL TABLE IF NOT EXISTS ssg1
+    > (stuname string, stuid int, stuexam string, subjectmarks array<struct<subject: string, marks: int>>)
+    > row format delimited fields terminated by '\t' collection items terminated by '|' MAP KEYS TERMINATED BY '#' lines terminated by '\n' location '/user/hduser/ssg1';
+OK
+Time taken: 0.098 seconds
+hive> load data local inpath
+    > '/home/hduser/Downloads/sharedfolder/studentsubjectsandgrades.txt' into table ssg1;
+Loading data to table nyse.ssg1
+Table nyse.ssg1 stats: [numFiles=0, totalSize=0]
+OK
+Time taken: 0.213 seconds
+hive> select stuname,stuid,stuexam,subandmarks from ssg1 lateral view explode(subjectmarks) exploded_table as subandmarks;
+OK
+stuname	stuid	stuexam	subandmarks
+Rahul	101	sem-1	{"subject":"english","marks":95}
+Rahul	101	sem-1	{"subject":"hindi","marks":90}
+Rahul	101	sem-1	{"subject":"math","marks":85}
+Rahul	101	sem-1	{"subject":"physics","marks":75}
+Rahul	101	sem-1	{"subject":"chem","marks":80}
+Ravi	102	sem-1	{"subject":"english","marks":70}
+Ravi	102	sem-1	{"subject":"hindi","marks":65}
+Ravi	102	sem-1	{"subject":"math","marks":60}
+Ravi	102	sem-1	{"subject":"physics","marks":55}
+Ravi	102	sem-1	{"subject":"chem","marks":50}
+Vinod	103	sem-1	{"subject":"english","marks":50}
+Vinod	103	sem-1	{"subject":"hindi","marks":45}
+Vinod	103	sem-1	{"subject":"math","marks":40}
+Vinod	103	sem-1	{"subject":"physics","marks":35}
+Vinod	103	sem-1	{"subject":"chem","marks":38}
+Rahul	101	sem-2	{"subject":"english","marks":90}
+Rahul	101	sem-2	{"subject":"hindi","marks":95}
+Rahul	101	sem-2	{"subject":"math","marks":80}
+Rahul	101	sem-2	{"subject":"physics","marks":70}
+Rahul	101	sem-2	{"subject":"chem","marks":85}
+Ravi	102	sem-2	{"subject":"english","marks":75}
+Ravi	102	sem-2	{"subject":"hindi","marks":60}
+Ravi	102	sem-2	{"subject":"math","marks":65}
+Ravi	102	sem-2	{"subject":"physics","marks":50}
+Ravi	102	sem-2	{"subject":"chem","marks":55}
+Vinod	103	sem-2	{"subject":"english","marks":55}
+Vinod	103	sem-2	{"subject":"hindi","marks":40}
+Vinod	103	sem-2	{"subject":"math","marks":45}
+Vinod	103	sem-2	{"subject":"physics","marks":30}
+Vinod	103	sem-2	{"subject":"chem","marks":33}
+Rahul	101	sem-3	{"subject":"english","marks":98}
+Rahul	101	sem-3	{"subject":"hindi","marks":95}
+Rahul	101	sem-3	{"subject":"math","marks":90}
+Rahul	101	sem-3	{"subject":"physics","marks":80}
+Rahul	101	sem-3	{"subject":"chem","marks":85}
+Ravi	102	sem-3	{"subject":"english","marks":75}
+Ravi	102	sem-3	{"subject":"hindi","marks":70}
+Ravi	102	sem-3	{"subject":"math","marks":65}
+Ravi	102	sem-3	{"subject":"physics","marks":60}
+Ravi	102	sem-3	{"subject":"chem","marks":55}
+Vinod	103	sem-3	{"subject":"english","marks":55}
+Vinod	103	sem-3	{"subject":"hindi","marks":50}
+Vinod	103	sem-3	{"subject":"math","marks":50}
+Vinod	103	sem-3	{"subject":"physics","marks":45}
+Vinod	103	sem-3	{"subject":"chem","marks":48}
+Time taken: 0.081 seconds, Fetched: 45 row(s)
+hive> SELECT
+    >    stuname, stuid, stuexam,
+    >    subandmarks.subject as subject,
+    >    subandmarks.marks as marks
+    > FROM 
+    >    ssg1 
+    >    LATERAL VIEW explode(subjectmarks) exploded_table as subandmarks;
+OK
+stuname	stuid	stuexam	subject	marks
+Rahul	101	sem-1	english	95
+Rahul	101	sem-1	hindi	90
+Rahul	101	sem-1	math	85
+Rahul	101	sem-1	physics	75
+Rahul	101	sem-1	chem	80
+Ravi	102	sem-1	english	70
+Ravi	102	sem-1	hindi	65
+Ravi	102	sem-1	math	60
+Ravi	102	sem-1	physics	55
+Ravi	102	sem-1	chem	50
+Vinod	103	sem-1	english	50
+Vinod	103	sem-1	hindi	45
+Vinod	103	sem-1	math	40
+Vinod	103	sem-1	physics	35
+Vinod	103	sem-1	chem	38
+Rahul	101	sem-2	english	90
+Rahul	101	sem-2	hindi	95
+Rahul	101	sem-2	math	80
+Rahul	101	sem-2	physics	70
+Rahul	101	sem-2	chem	85
+Ravi	102	sem-2	english	75
+Ravi	102	sem-2	hindi	60
+Ravi	102	sem-2	math	65
+Ravi	102	sem-2	physics	50
+Ravi	102	sem-2	chem	55
+Vinod	103	sem-2	english	55
+Vinod	103	sem-2	hindi	40
+Vinod	103	sem-2	math	45
+Vinod	103	sem-2	physics	30
+Vinod	103	sem-2	chem	33
+Rahul	101	sem-3	english	98
+Rahul	101	sem-3	hindi	95
+Rahul	101	sem-3	math	90
+Rahul	101	sem-3	physics	80
+Rahul	101	sem-3	chem	85
+Ravi	102	sem-3	english	75
+Ravi	102	sem-3	hindi	70
+Ravi	102	sem-3	math	65
+Ravi	102	sem-3	physics	60
+Ravi	102	sem-3	chem	55
+Vinod	103	sem-3	english	55
+Vinod	103	sem-3	hindi	50
+Vinod	103	sem-3	math	50
+Vinod	103	sem-3	physics	45
+Vinod	103	sem-3	chem	48
+Time taken: 0.106 seconds, Fetched: 45 row(s)
+hive> show tables;
+OK
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedividends
+ssg1
+stugrades
+Time taken: 0.305 seconds, Fetched: 6 row(s)
+hive> ADD JAR /usr/local/hive/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.2.jar;
+Added [/usr/local/hive/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.2.jar] to class path
+Added resources: [/usr/local/hive/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.2.jar]
+hive> CREATE EXTERNAL TABLE json2(author string, country string, imageLink string, language string, link string, pages int, title string, year int) ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe' location '/user/hduser/json2';
+OK
+Time taken: 0.387 seconds
+hive> load data local inpath '/home/hduser/Downloads/sharedfolder/testdoc.json' into table json2;
+Loading data to table nyse.json2
+Table nyse.json2 stats: [numFiles=0, numRows=0, totalSize=0, rawDataSize=0]
+OK
+Time taken: 0.889 seconds
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json2 limit 3;
+FAILED: SemanticException [Error 10004]: Line 1:7 Invalid table alias or column reference 'product_name': (possible column names are: author, country, imagelink, language, link, pages, title, year)
+hive> CREATE EXTERNAL TABLE json3 (salestxn_id string,product_name string, category_details struct<product_category: string, category_id: string>, product_price float, product_quantity int, customer_id bigint) ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe' location '/user/hduser/json3';
+OK
+Time taken: 0.115 seconds
+hive> load data inpath '/user/hduser/retaildata.json' into table json3;
+Loading data to table nyse.json3
+Table nyse.json3 stats: [numFiles=0, numRows=0, totalSize=0, rawDataSize=0]
+OK
+Time taken: 0.426 seconds
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json3 limit 3;
+OK
+O'Brien Men's Neoprene Life Vest	Fishing	45	49.98	2
+O'Brien Men's Neoprene Life Vest	Fishing	45	49.98	2
+Time taken: 0.243 seconds, Fetched: 2 row(s)
+hive> load data local inpath         '/home/hduser/Downloads/sharedfolder/testdoc.json' into table json2;
+Loading data to table nyse.json2
+Table nyse.json2 stats: [numFiles=0, numRows=0, totalSize=0, rawDataSize=0]
+OK
+Time taken: 0.4 seconds
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json2 limit 3;
+FAILED: SemanticException [Error 10004]: Line 1:7 Invalid table alias or column reference 'product_name': (possible column names are: author, country, imagelink, language, link, pages, title, year)
+
+hive> CREATE EXTERNAL TABLE json2(author string, country string, imageLink string, language string, link string, pages int, title string, year int) ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe' location '/user/hduser/json2';
+OK
+Time taken: 0.105 seconds
+hive> load data inpath '/user/hduser/testdoc.json' into table json2;
+Loading data to table nyse.json2
+Table nyse.json2 stats: [numFiles=0, numRows=0, totalSize=0, rawDataSize=0]
+OK
+Time taken: 0.389 seconds
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json2 limit 3;
+FAILED: SemanticException [Error 10004]: Line 1:7 Invalid table alias or column reference 'product_name': (possible column names are: author, country, imagelink, language, link, pages, title, year)
+hive> select * from json2;
+OK
+Failed with exception java.io.IOException:org.apache.hadoop.hive.serde2.SerDeException: org.codehaus.jackson.JsonParseException: Unexpected end-of-input: expected close marker for OBJECT (from [Source: java.io.ByteArrayInputStream@77ba583; line: 1, column: 0])
+ at [Source: java.io.ByteArrayInputStream@77ba583; line: 1, column: 7]
+Time taken: 0.148 seconds
+hive> CREATE EXTERNAL TABLE json3 (salestxn_id string,product_name string, category_details struct<product_category: string, category_id: string>, product_price float, product_quantity int, customer_id bigint) ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe' location '/user/hduser/json3';
+OK
+Time taken: 0.115 seconds
+hive> load data inpath '/user/hduser/retaildata.json' into table json3;
+Loading data to table nyse.json3
+Table nyse.json3 stats: [numFiles=0, numRows=0, totalSize=0, rawDataSize=0]
+OK
+Time taken: 0.426 seconds
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json3 limit 3;
+OK
+O'Brien Men's Neoprene Life Vest	Fishing	45	49.98	2
+O'Brien Men's Neoprene Life Vest	Fishing	45	49.98	2
+Time taken: 0.243 seconds, Fetched: 2 row(s)
+hive> select product_name, category_details.product_category, category_details.category_id, product_price, product_quantity from json2 limit 3;
+FAILED: SemanticException [Error 10004]: Line 1:7 Invalid table alias or column reference 'product_name': (possible column names are: author, country, imagelink, language, link, pages, title, year)
+hive> show tables;
+OK
+json2
+json3
+nysedaily
+nysedaily_bucket
+nysedaily_part
+nysedividends
+ssg1
+stugrades
+Time taken: 0.052 seconds, Fetched: 8 row(s)
+hive> ^Chduser@hduser-VirtualBox:~$ exit;
