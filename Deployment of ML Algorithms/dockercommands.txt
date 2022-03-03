@@ -1,0 +1,30 @@
+cd awsTraining
+
+docker pull docker/geting-started 
+or 
+docker run -d -p 80:80 docker/getting-started
+
+
+docker ps
+
+docker stop e00
+
+docker images
+
+docker rmi eb9194091564
+
+docker rmi --force eb9194091564
+
+notepad Dockerfile
+
+notepad requirements
+
+rename Dockerfile.txt Dockerfile
+
+docker build --tag python-docker .
+
+docker run -d -p 5000:5000 docker/python-docker
+
+
+
+

@@ -1,0 +1,12 @@
+Serving you from templates folder.
+I am s1.html
+<br>
+Embedded in me is JS file from static folder.
+
+<script src="{{  url_for('static', filename='hello.js')  }} " >
+
+
+</script>
+
+
+<input type=button onclick="sayHello()" value="Click Me">
